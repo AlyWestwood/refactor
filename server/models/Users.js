@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
       },
       phone: {
-        type: DataTypes.STRING(15),
+        type: DataTypes.STRING(10),
         allowNull: false,
       },
       role: {
@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
       },
-      role: {
+      activeStatus: {
         type: DataTypes.ENUM("active", "inactive"),
         allowNull: false,
       },
