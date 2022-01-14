@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const Users = sequelize.define("users", {
+    const Users = sequelize.define("Users", {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -22,8 +22,21 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(15),
         allowNull: false,
       },
-      isDone: {
-        type: DataTypes.ENUM("pending", "done"),
+      role: {
+        type: DataTypes.ENUM("user", "admin"),
+        allowNull: false,
+      },
+      birthdate: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+      },
+      sin: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
+        unique: true,
+      },
+      role: {
+        type: DataTypes.ENUM("active", "inactive"),
         allowNull: false,
       },
       password: {
@@ -32,9 +45,9 @@ module.exports = (sequelize, DataTypes) => {
       }
     });
   
-    // Users.associate = (models) => {
-    //   Users.hasMany(models.todos, {});
-    // };
+    Users.associate = (models) => {
+      Users.hasMany(models.Accounts, {as: 'userId'});
+    };
   
     return Users;
   };
