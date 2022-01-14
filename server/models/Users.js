@@ -32,9 +32,9 @@ module.exports = (sequelize, DataTypes) => {
       }
     });
   
-    Users.associate = (models) => {
-      Users.hasMany(models.todos, {});
-    };
+    // Users.associate = (models) => {
+    //   Users.hasMany(models.todos, {});
+    // };
   
     return Users;
   };
