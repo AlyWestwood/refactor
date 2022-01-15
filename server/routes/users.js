@@ -3,7 +3,7 @@ const router = express.Router();
 const { Users } = require("../models");
 const bcrypt = require("bcrypt");
 var validator = require("email-validator");
-const { createTokens } = require("../misc/authware");
+const { createTokens, validateToken } = require("../misc/authware");
 
 
 router.post("/register", async (req, res) => {
@@ -67,6 +67,16 @@ router.post("/login", async (req, res) => {
     console.log(user);
     res.json({ message: "Logged in", userId: user.id, token: accessToken, role: user.role });
   });
+});
+
+router.post("/auth", validateToken, async (req, res) => {
+
+  const user = await Users.findByPk(req.userId);
+  if (!user) {
+    res.status(403).json({ error: "No user found" });
+    return;
+  }
+    res.json({ message: "Logged in", userId: user.id, token: accessToken, role: user.role });
 });
 
 module.exports = router;
