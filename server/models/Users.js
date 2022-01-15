@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
       },
       activeStatus: {
-        type: DataTypes.ENUM("active", "inactive"),
+        type: DataTypes.ENUM("active", "inactive", "disabled"),
         allowNull: false,
       },
       password: {
