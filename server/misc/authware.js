@@ -21,7 +21,6 @@ const validateToken = (req, res, next) => {
         if(validToken){
             req.authenticated = true;
             req.userId = validToken.id;
-            console.log("going next" + req.userId);
             return next();
         }
     }catch(err){

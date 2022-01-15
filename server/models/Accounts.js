@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       balance: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
+        defaultValue: 0
       },
       creditLimit: {
         type: DataTypes.DECIMAL(10, 2)
@@ -35,6 +36,11 @@ module.exports = (sequelize, DataTypes) => {
       minimumPayment: {
         type: DataTypes.DECIMAL(10, 2)
       },
+      activeStatus: {
+        type: DataTypes.ENUM("active", "inactive", "disabled"),
+        defaultValue: "inactive",
+        allowNull: false,
+      }
     });
   
     Accounts.associate = (models) => {
