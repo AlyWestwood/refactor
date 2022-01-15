@@ -65,7 +65,7 @@ router.post("/login", async (req, res) => {
     const accessToken = createTokens(user);
 
     console.log(user);
-    res.json({ message: "Logged in", userId: user.id, token: accessToken });
+    res.json({ message: "Logged in", userId: user.id, token: accessToken, role: user.role });
   });
 });
 

@@ -17,34 +17,39 @@ function Login() {
   /* This will be different from the blog auth context because we will include the user role */
   const login = () => {
     const user = { email: email, password: password };
-    axios.post("/auth/login", user).then(res => {
+    axios.post("/users/login", user).then(res => {
       if(res.data.error) {
           alert(res.data.error);
       } else {
-        localStorage.setItem("accessToken", res.data.accessToken);
+        localStorage.setItem("accessToken", res.data.token);
         setAuthState(res.data.role);
         navigate('/');
       }
     });
   };
   return (
-    <div className="loginContainer">
-      <label>email:</label>
+    <div className="col-3 p-3">
+      <div className="mb-3">
+      <label className="form-label">email:</label>
       <input
         type="text"
         onChange={event => {
           setEmail(event.target.value);
         }}
+        className="form-control"
       />
-      <label>Password:</label>
+      </div>
+      <div className="mb-3">
+      <label className="form-label">Password:</label>
       <input
         type="password"
         onChange={event => {
           setPassword(event.target.value);
         }}
+        className="form-control"
       />
-
-      <button onClick={login}> Login </button>
+      </div>
+      <button onClick={login} className="btn btn-primary"> Login </button>
     </div>
   );
 }
