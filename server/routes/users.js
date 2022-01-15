@@ -38,7 +38,7 @@ router.post("/register", async (req, res) => {
     Users
       .create(user)
       .then(() => {
-        res.json("here");
+        res.json({"message": "Successful registration"});
       })
       .catch((err) => {
         if (err) {
@@ -64,11 +64,7 @@ router.post("/login", async (req, res) => {
 
     const accessToken = createTokens(user);
 
-    // res.cookie("access-token", accessToken, {
-    //   maxAge: 2592000000,
-    //   httpOnly: true
-    // });
-
+    console.log(user);
     res.json({ message: "Logged in", userId: user.id, token: accessToken });
   });
 });
