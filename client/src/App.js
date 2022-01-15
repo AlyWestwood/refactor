@@ -7,29 +7,29 @@ import { AuthContext } from './misc/AuthContext'
 import Home from './pages/common/Home';
 import Login from './pages/common/Login';
 import Register from './pages/common/Register.js';
-import { NewAccount as NewAccountA } from './pages/admin/NewAccount';
-import { Transfer as TransferA } from './pages/admin/Transfer';
+import NewAccountA from './pages/admin/NewAccount';
+import TransferA from './pages/admin/Transfer';
 import Account from './pages/client/Account';
 import Deposit from './pages/client/Deposit';
-import { NewAccount as NewAccountC } from './pages/client/Account';
+import NewAccountC from './pages/client/Account';
 import PayBills from './pages/client/PayBills';
 import Transactions from './pages/client/Transactions';
-import { Transfer as TransferC } from './pages/client/Transfer';
+import TransferC from './pages/client/Transfer';
 
 function App() {
 
 /* authorization */
 const [authState, setAuthState] = useState(false);
 
-useEffect(()=>{
-  axios.get("/auth", {
-    headers: {
-      accessToken: localStorage.getItem("accessToken")
-    }
-  }).then(res => {
-    setAuthState(res.data.error ? false : true)
-  });
-}, []);
+// useEffect(()=>{
+//   axios.get("/auth", {
+//     headers: {
+//       accessToken: localStorage.getItem("accessToken")
+//     }
+//   }).then(res => {
+//     setAuthState(res.data.error ? false : true)
+//   });
+// }, []);
 
 
   return (
@@ -63,7 +63,7 @@ useEffect(()=>{
           <Route path="transfer" element={<TransferA/>}/>
           <Route path="openAccount" element={<NewAccountA/>}/>
         </Route>
-        
+
         </Routes>
       </Router>
       </AuthContext.Provider>
@@ -76,14 +76,15 @@ function Layout() {
     <div>
       <header>
         <nav>
-          <ul>
-            <li><Link to="login">Log In</Link></li>
-            <li><Link to="register">Register</Link></li>
+          <ul className='nav'>
+            <li className='nav-item'><Link to="login" className='nav-link'>Log In</Link></li>
+            <li className='nav-item'><Link to="register" className='nav-link'>Register</Link></li>
           </ul>
         </nav>
         <h1>Refactor</h1>
       </header>
-    <Outlet/>
+      <div className='container d-flex justify-content-center'><Outlet/></div>
+    
     <Footer/>
     </div>
   )

@@ -11,4 +11,4 @@ function Transfer() {
     )
 }
 
-export default Transfer
+export default Transfer;

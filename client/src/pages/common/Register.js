@@ -14,23 +14,23 @@ function Register() {
         lastName: "",
         phone: "",
         birthdate: "",
-        SIN: "",
+        sin: "",
         email: "",
         password: ""
     };
 
     const validationSchema = yup.object().shape({
-        firstName: yup.string().required(),
-        lastName: yup.string().required(),
+        firstName: yup.string().min(3).max(100).required(),
+        lastName: yup.string().min(3).max(100).required(),
         phone: yup.string().required(),
         birthdate: yup.date().required(),
-        SIN: yup.string(9).required(),
+        sin: yup.string(9).required(),
         email: yup.string().min(3).max(20).required(),
         password: yup.string().min(4).max(20).required()
     });
 
     const onSubmit = newUser => {
-        axios.post("/auth", newUser).then(res => {
+        axios.post("/users/register", newUser).then(res => {
           console.log(res.data);
           navigate('/login');
         });
@@ -39,76 +39,91 @@ function Register() {
     const navigate = useNavigate();
 
     return (
-        <div>
+        <div className='col-5'>
         <Formik
           initialValues={initialValues}
           onSubmit={onSubmit}
           validationSchema={validationSchema}
         >
           <Form className="formContainer">
-            <label>First Name: </label>
+            <div className='mb-3'>
+            <label className='form-label'>First Name: </label>
             <ErrorMessage name="firstName" component="span" />
             <Field
-              className="inputNewEntry"
+              className="inputNewEntry form-control"
               name="firstName"
               type="text"
               placeholder="(Ex. Jane)"
             />
+            </div>
 
-            <label>Last Name: </label>
+            <div className='mb-3'>
+            <label className='form-label'>Last Name: </label>
             <ErrorMessage name="lastName" component="span" />
             <Field
-              className="inputNewEntry"
+              className="inputNewEntry form-control"
               name="lastName"
               type="text"
               placeholder="(Ex. Doe)"
             />
-
-            <label>Email: </label>
+            </div>
+            
+            <div className='mb-3'>
+            <label className='form-label'>Email: </label>
             <ErrorMessage name="phone" component="span" />
             <Field
-              className="inputNewEntry"
+              className="inputNewEntry form-control"
               name="phone"
               type="phone"
               placeholder="(Ex. John123...)"
             />
+            </div>
+            
+            <div className='mb-3'>
 
-            <label>Email: </label>
+            <label className='form-label'>Email: </label>
             <ErrorMessage name="birthdate" component="span" />
             <Field
-              className="inputNewEntry"
+              className="inputNewEntry form-control"
               name="birthdate"
               type="date"
             />
-
-            <label>Phone: </label>
+            </div>
+            
+            <div className='mb-3'>
+            <label className='form-label'>Phone: </label>
             <ErrorMessage name="SIN" component="span" />
             <Field
-              className="inputNewEntry"
+              className="inputNewEntry form-control"
               name="SIN"
               type="text"
               placeholder="(Ex. John123...)"
             />
-
-            <label>Email: </label>
+            </div>
+            
+            <div className='mb-3'>
+            <label className='form-label'>Email: </label>
             <ErrorMessage name="email" component="span" />
             <Field
-              className="inputNewEntry"
+              className="inputNewEntry form-control"
               name="email"
               type="email"
               placeholder="(Ex. John123...)"
             />
-  
-            <label>Password: </label>
+            </div>
+            
+            <div className='mb-3'>
+            <label className='form-label'>Password: </label>
             <ErrorMessage name="password" component="span" />
             <Field
               type="password"
-              className="inputNewEntry"
+              className="inputNewEntry form-control"
               name="password"
               placeholder="Your Password..."
             />
-  
-            <button type="submit"> Register</button>
+            </div>
+
+            <button type="submit" className='btn btn-primary'> Register</button>
           </Form>
         </Formik>
       </div>    )

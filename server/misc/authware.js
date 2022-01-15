@@ -3,7 +3,7 @@ const { sign, verify } = require("jsonwebtoken");
 const createTokens = (user) => {
   const accessToken = sign(
     { username: user.usermame, id: user.id },
-    "supersecuresecret",
+    process.env.AUTHSECRET,
     {}
   );
 
