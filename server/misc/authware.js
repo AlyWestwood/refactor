@@ -4,7 +4,7 @@ const { Users } = require("../models");
 const createTokens = (user) => {
   const accessToken = sign(
     { username: user.usermame, id: user.id },
-    "supersecuresecret",
+    process.env.AUTHSECRET,
     {}
   );
 
@@ -16,7 +16,7 @@ const validateToken = (req, res, next) => {
   if (!accessToken)
     return res.status(403).json({ error: "User not autheticated" });
   try {
-    const validToken = verify(accessToken, "supersecuresecret");
+    const validToken = verify(accessToken, process.env.AUTHSECRET);
 
     if (validToken) {
       req.authenticated = true;
