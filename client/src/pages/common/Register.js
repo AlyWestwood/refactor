@@ -69,7 +69,7 @@ function Register() {
             </div>
             
             <div className='mb-3'>
-            <label className='form-label'>Email: </label>
+            <label className='form-label'>Phone: </label>
             <ErrorMessage name="phone" component="span" />
             <Field
               className="inputNewEntry form-control"
@@ -81,7 +81,7 @@ function Register() {
             
             <div className='mb-3'>
 
-            <label className='form-label'>Email: </label>
+            <label className='form-label'>Birthdate: </label>
             <ErrorMessage name="birthdate" component="span" />
             <Field
               className="inputNewEntry form-control"
@@ -91,11 +91,11 @@ function Register() {
             </div>
             
             <div className='mb-3'>
-            <label className='form-label'>Phone: </label>
+            <label className='form-label'>SIN: </label>
             <ErrorMessage name="SIN" component="span" />
             <Field
               className="inputNewEntry form-control"
-              name="SIN"
+              name="sin"
               type="text"
               placeholder="(Ex. John123...)"
             />
