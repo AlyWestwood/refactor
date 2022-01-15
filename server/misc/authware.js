@@ -1,19 +1,32 @@
-const { verify } = require("jsonwebtoken");
+const { sign, verify } = require("jsonwebtoken");
 
-const validateToken = (req, res, next) => {
-  const accessToken = req.header("accessToken");
+const createTokens = (user) => {
+  const accessToken = sign(
+    { username: user.usermame, id: user.id },
+    "supersecuresecret",
+    {}
+  );
 
-  if (!accessToken) return res.json({ error: "User not logged in!" });
-
-  try {
-    const validToken = verify(accessToken, process.env.AUTHSECRET);
-    req.user = validToken;
-    if (validToken) {
-      return next();
-    }
-  } catch (err) {
-    return res.json({ error: err });
-  }
+  return accessToken;
 };
 
-module.exports = { validateToken };
+const validateToken = (req, res, next) => {
+    const accessToken = req.header("accessToken");
+    console.log(accessToken);
+    if(!accessToken) 
+        return res.status(403).json({error: "User not autheticated"});
+    try{
+        const validToken = verify(accessToken, "supersecuresecret");
+        
+        if(validToken){
+            req.authenticated = true;
+            req.userId = validToken.id;
+            return next();
+        }
+    }catch(err){
+        return res.status(400).json({error: err});
+    }
+
+}
+
+module.exports = { createTokens, validateToken };
