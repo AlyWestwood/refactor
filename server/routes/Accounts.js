@@ -19,28 +19,31 @@ router.get("/getAccounts", validateToken, async (req, res) => {
 /**
  * For creating debit accounts. since credit accounts need to be authorized, that's a different process
  */
-router.post("/createDebitAccount", validateToken, async (req, res) => {
+router.post("/createAccount", validateToken, async (req, res) => {
   const userId = req.userId;
-  const { currency } = req.body;
+  const { currency, accountType } = req.body;
 
   const user = await Users.findByPk(userId);
 
-  const error = validateBasicAccount(user, req.body);
+  const error = validateAccountApplication(user, req.body);
   if (error) {
     return res.status(400).json(error);
   }
 
   const account = {
-    accountType: "debit",
+    accountType: accountType,
     currency: currency,
     UserId: userId,
-    activeStatus: "active",
   };
+
+  if (accountType === "debit") {
+    account.activeStatus = "active";
+  }
 
   Accounts.create(account)
     .then((response) => {
       res.json({
-        message: "Debit account created successfully",
+        message: "Account created successfully",
         account: response,
       });
     })
@@ -49,16 +52,22 @@ router.post("/createDebitAccount", validateToken, async (req, res) => {
     });
 });
 
-
-
-function validateBasicAccount(user, requestBody) {
-  const { currency } = requestBody;
+function validateAccountApplication(user, requestBody) {
+  const { currency, accountType } = requestBody;
   if (!user) {
     return { error: "User not found" };
   }
 
   if (user.activeStatus !== "active") {
     return { error: "User not active" };
+  }
+
+  if (!["debit", "credit"].includes(accountType)) {
+    return { error: "Invalid account type" };
+  }
+
+  if (accountType === "credit" && currency !== "CAD") {
+    return { error: "Credit accounts must be CAD" };
   }
 
   if (!["USD", "GBP", "EUR", "CAD"].includes(currency)) {
