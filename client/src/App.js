@@ -20,16 +20,27 @@ function App() {
 
 /* authorization */
 const [authState, setAuthState] = useState(false);
+const [adminState, setAdminState] = useState(false);
+const [clientState, setClientState] = useState(false);
 
-// useEffect(()=>{
-//   axios.get("/auth", {
-//     headers: {
-//       accessToken: localStorage.getItem("accessToken")
-//     }
-//   }).then(res => {
-//     setAuthState(res.data.error ? false : true)
-//   });
-// }, []);
+useEffect(()=>{
+  axios.get("/users/auth", {
+    headers: {
+      accessToken: localStorage.getItem("accessToken")
+    }
+  }).then(res => {
+    if(!res.data.error){
+      setAuthState(true);
+    }
+    if(res.data.role === "admin"){
+      setAdminState(true);
+    } else if(res.data.role === "client"){
+      setClientState(true);
+    } else {
+      setAuthState(false);
+    }
+  });
+}, []);
 
 
   return (
@@ -79,6 +90,8 @@ function Layout() {
           <ul className='nav'>
             <li className='nav-item'><Link to="login" className='nav-link'>Log In</Link></li>
             <li className='nav-item'><Link to="register" className='nav-link'>Register</Link></li>
+            <li><Link className='nav-link' to="/login" onClick={logout} >Log Out</Link></li>
+
           </ul>
         </nav>
         <h1>Refactor</h1>
@@ -90,13 +103,17 @@ function Layout() {
   )
 }
 
+const logout = function Logout(){
+  localStorage.removeItem("accessToken");
+}
+
 function AdminLayout() {
   return (
     <div>
        <header>
         <nav>
           <ul>
-            <li><Link to="login">Log In</Link></li>
+          <li><Link className='nav-link' to="/login" onClick={logout} >Log Out</Link></li>
             <li><Link to="register">Register</Link></li>
           </ul>
         </nav>
@@ -115,7 +132,7 @@ function ClientLayout() {
        <header>
         <nav>
           <ul>
-            <li><Link to="login">Log In</Link></li>
+          <li><Link className='nav-link' to="/login" onClick={logout} >Log Out</Link></li>
             <li><Link to="register">Register</Link></li>
           </ul>
         </nav>
