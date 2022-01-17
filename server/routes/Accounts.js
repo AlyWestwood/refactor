@@ -17,7 +17,7 @@ router.get("/getAccounts", validateToken, async (req, res) => {
 });
 
 /**
- * For creating debit accounts. since credit accounts need to be authorized, that's a different process
+ * Creadting debit or credit accounts. passed values should be accountType, currency
  */
 router.post("/createAccount", validateToken, async (req, res) => {
   const userId = req.userId;
