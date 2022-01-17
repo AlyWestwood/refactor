@@ -17,6 +17,23 @@ router.get("/getAccounts", validateToken, async (req, res) => {
 });
 
 /**
+ * params: logged in user, account id in url
+ * returns: account requested
+ * 
+ * checks the logged in user can access the account, returns the account if correct
+ */
+router.get("/singleAccount/:id", validateToken, async (req, res) => {
+  const accountId = req.params.id;
+  const account = await Accounts.findOne({where: {UserId: req.userId, id: accountId}});
+
+  if (!account) {
+    return res.status(404).json({ error: "No account found" });
+  }
+  
+  res.json({ account: account });
+});
+
+/**
  * Creadting debit or credit accounts. passed values should be accountType, currency
  */
 router.post("/createAccount", validateToken, async (req, res) => {
