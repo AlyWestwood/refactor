@@ -94,4 +94,7 @@ router.post("/auth", validateToken, async (req, res) => {
   });
 });
 
+
+
+
 module.exports = router;

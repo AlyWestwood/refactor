@@ -31,3 +31,22 @@ initial setup of pages and routes
 3. Where do I need assistance? What do I need to figure out?
 how to use react 
 
+15 Jan 2022
+Kate
+1. What I have done / not done since last Scrum?
+-registration / login backend
+-created middleware for admin
+- sequelize - database done
+- backend routes
+2. What I plan to do from this scrum to next? (next 24 hours)
+- more routes, continuing backend functionality
+3. Where do I need assistance? What do I need to figure out?
+ --
+
+Aly
+1. What I have done / not done since last Scrum?
+- some initial front-end groundwork - creating pages/routes etc.
+2. What I plan to do from this scrum to next? (next 24 hours)
+- plan visual design of app and refine routing
+3. Where do I need assistance? What do I need to figure out?
+- how to use react-router / learning react-conventions
