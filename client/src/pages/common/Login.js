@@ -3,7 +3,7 @@
  */
 import React, { useState, useContext } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../misc/AuthContext";
 
 
@@ -57,14 +57,18 @@ function Login() {
 
 function Logout(){
     // let navigate = useNavigate();
-    const { setAuthState, setAuthRole } = useContext(AuthContext);
+    // const { setAuthState, setAuthRole } = useContext(AuthContext);
 
 
     localStorage.removeItem("accessToken");
-    setAuthState(false);
-    setAuthRole(null);
+    // setAuthState(false);
+    // setAuthRole(null);
     
-    return null;
+    return (
+      <>
+      <Navigate to="/login"/>
+      </>
+    );
 }
 
 export { Login, Logout };
