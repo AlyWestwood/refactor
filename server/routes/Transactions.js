@@ -4,6 +4,12 @@ const { Users } = require("../models");
 const { Transactions, Accounts } = require("../models");
 const { validateToken } = require("../misc/authware");
 const axios = require("axios");
+var AWS = require('aws-sdk');
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
+
 /**
  * gets transactions of specific account after verifying account can be accessed by logged in user
  *
@@ -162,6 +168,48 @@ router.post("/transferFunds", validateToken, async (req, res) => {
   });
   return res.json("Transferred successfully");
 });
+
+
+
+/**
+ * cheques !!
+ */
+
+
+router.post("/upload", (req, res) => {
+    const {fileName} = req.body;
+    // Create S3 service object
+    var s3 = new AWS.S3({apiVersion: '2006-03-01'});
+    
+    // call S3 to retrieve upload file to specified bucket
+    var uploadParams = {Bucket: process.env.S3BUCKET, Key: '', Body: ''};
+    var file = "test/" + fileName;
+    
+    // Configure the file stream and obtain the upload parameters
+    var fs = require('fs');
+    var fileStream = fs.createReadStream(file);
+    fileStream.on('error', function(err) {
+      console.log('File Error', err);
+    });
+    uploadParams.Body = fileStream;
+    var path = require('path');
+    uploadParams.Key = path.basename(file);
+    
+    // call S3 to retrieve upload file to specified bucket
+    s3.upload (uploadParams, function (err, data) {
+      if (err) {
+        console.log("Error", err);
+      } if (data) {
+        console.log("Upload Success", data.Location);
+      }
+    });
+    
+
+    res.json("completed");
+})
+
+
+
 
 /**
  * request payment
