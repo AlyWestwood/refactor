@@ -49,6 +49,20 @@ router.post("/disableUser", validateAdminToken, async (req, res) => {
     });
 });
 
+router.put("/enableUser", validateAdminToken, (req, res) => {
+  const { userId } = req.body;
+  Users.update({activeStatus: "active"}, {where: {id: userId}}).then((result) =>{
+    if(result == true){
+      return res.json({message: "updated user " + userId + " to active status"});
+    }else{
+      return res.status(404).json("Could not find user");
+    }
+  }).catch((err) => {
+    return res.status(400).json(err);
+  })
+})
+
+
 /** this method needs an array of user ids ie [1,2,3]
  * it will set each user status to active
  */
