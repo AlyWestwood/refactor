@@ -14,7 +14,7 @@ const createTokens = (user) => {
 const validateToken = (req, res, next) => {
   const accessToken = req.header("accessToken");
   if (!accessToken)
-    return res.status(403).json({ error: "User not autheticated" });
+    return res.status(403).json({ error: "User not authenticated (no access token)" });
   try {
     const validToken = verify(accessToken, process.env.AUTHSECRET);
 
@@ -30,7 +30,7 @@ const validateToken = (req, res, next) => {
 const validateAdminToken = async (req, res, next) => {
   const accessToken = req.header("accessToken");
   if (!accessToken)
-    return res.status(403).json({ error: "User not autheticated" });
+    return res.status(403).json({ error: "User not auntheticated" });
   try {
     const validToken = verify(accessToken, process.env.AUTHSECRET);
 

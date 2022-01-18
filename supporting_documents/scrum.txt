@@ -50,3 +50,54 @@ Aly
 - plan visual design of app and refine routing
 3. Where do I need assistance? What do I need to figure out?
 - how to use react-router / learning react-conventions
+
+17 Jan 2022
+Kate
+1. What I have done / not done since last Scrum?
+- sequelize debugging
+- added endpoints
+- planned transfers functionality
+- planning payment request and started implementation
+2. What I plan to do from this scrum to next? (next 24 hours)
+- figure out sequelize
+- fix database in workbench
+3. Where do I need assistance? What do I need to figure out?
+- what's going on with sequelize
+
+Aly
+1. What I have done / not done since last Scrum?
+- planning front-end in figma
+- got registration working from front-end - now fully functional
+- basic bootstrap
+
+2. What I plan to do from this scrum to next? (next 24 hours)
+- continue planning website design
+- start implenting design - css, bootstrap, pages
+
+3. Where do I need assistance? What do I need to figure out?
+- mostly just planning getting figma design into styling
+- also navigation
+
+18 Jan 2022
+Kate
+1. What I have done / not done since last Scrum?
+- made transactions endpoints
+- s3 bucket 
+- signed up for exchange rate API
+2. What I plan to do from this scrum to next? (next 24 hours)
+- finish bucket stuff
+- maybe into chron jobs - emails, overdue fees, time interval deposits
+3. Where do I need assistance? What do I need to figure out?
+- not yet
+
+Aly
+1. What I have done / not done since last Scrum?
+- working on login
+- start implementing styling
+
+2. What I plan to do from this scrum to next? (next 24 hours)
+- get login working reliably
+- continue what i was supposed to do yesterday
+
+3. Where do I need assistance? What do I need to figure out?
+- how to properly / effectively use contexts 
