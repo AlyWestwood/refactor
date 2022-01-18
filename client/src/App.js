@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
+import './bootstrap.scss';
 import './App.css';
-import {BrowserRouter as Router, Route, Routes, Link, Outlet} from 'react-router-dom';
+import {BrowserRouter as Router, Route, Routes, Link, Outlet, Navigate} from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from './misc/AuthContext'
 import Home from './pages/common/Home';
-import Login from './pages/common/Login';
+import { Login, Logout } from './pages/common/Login';
 import Register from './pages/common/Register.js';
 import NewAccountA from './pages/admin/NewAccount';
 import TransferA from './pages/admin/Transfer';
@@ -15,37 +16,15 @@ import NewAccountC from './pages/client/Account';
 import PayBills from './pages/client/PayBills';
 import Transactions from './pages/client/Transactions';
 import TransferC from './pages/client/Transfer';
+import Header from './pages/common/Header';
+import GetAuth from './misc/GetAuth';
 
 function App() {
-
-/* authorization */
-const [authState, setAuthState] = useState(false);
-const [adminState, setAdminState] = useState(false);
-const [clientState, setClientState] = useState(false);
-
-useEffect(()=>{
-  axios.get("/users/auth", {
-    headers: {
-      accessToken: localStorage.getItem("accessToken")
-    }
-  }).then(res => {
-    if(!res.data.error){
-      setAuthState(true);
-    }
-    if(res.data.role === "admin"){
-      setAdminState(true);
-    } else if(res.data.role === "client"){
-      setClientState(true);
-    } else {
-      setAuthState(false);
-    }
-  });
-}, []);
 
 
   return (
     <div className="App">
-      <AuthContext.Provider value={{authState, setAuthState}}>
+      <GetAuth>
       <Router>
         <Routes>
           {/* react router dom v6 reference for nested routes https://reactrouter.com/docs/en/v6/getting-started/overview#nested-routes */}
@@ -53,9 +32,10 @@ useEffect(()=>{
  
         {/* common routes */}
 
-          <Route path="/" element={<Layout/>}>
+          <Route path="/" element={<Layout />}>
             <Route path="home" element={<Home/>}/>
             <Route path="login" element={<Login/>}/>
+            <Route path="/logout" element={<Logout/>}/>
             <Route path="register" element={<Register/>}/>
           </Route>
         {/* client routes */}
@@ -77,25 +57,16 @@ useEffect(()=>{
 
         </Routes>
       </Router>
-      </AuthContext.Provider>
+      </GetAuth>
     </div>
   );
 }
 
 function Layout() {
+  // console.log(authState)
   return (
     <div>
-      <header>
-        <nav>
-          <ul className='nav'>
-            <li className='nav-item'><Link to="login" className='nav-link'>Log In</Link></li>
-            <li className='nav-item'><Link to="register" className='nav-link'>Register</Link></li>
-            <li><Link className='nav-link' to="/login" onClick={logout} >Log Out</Link></li>
-
-          </ul>
-        </nav>
-        <h1>Refactor</h1>
-      </header>
+      <Header />
       <div className='container d-flex justify-content-center'><Outlet/></div>
     
     <Footer/>
@@ -103,22 +74,15 @@ function Layout() {
   )
 }
 
-const logout = function Logout(){
-  localStorage.removeItem("accessToken");
-}
+// const logout = function(){
+//   localStorage.removeItem("accessToken");
+//   Navigate("/");
+// }
 
 function AdminLayout() {
   return (
     <div>
-       <header>
-        <nav>
-          <ul>
-          <li><Link className='nav-link' to="/login" onClick={logout} >Log Out</Link></li>
-            <li><Link to="register">Register</Link></li>
-          </ul>
-        </nav>
-        <h1>Refactor</h1>
-      </header>
+      <Header />
     <h2>Admin Dashboard</h2>
     <Outlet/>
     <Footer/>
@@ -129,15 +93,7 @@ function AdminLayout() {
 function ClientLayout() {
   return (
     <div>
-       <header>
-        <nav>
-          <ul>
-          <li><Link className='nav-link' to="/login" onClick={logout} >Log Out</Link></li>
-            <li><Link to="register">Register</Link></li>
-          </ul>
-        </nav>
-        <h1>Refactor</h1>
-      </header>
+      <Header />
     <h2>Admin Dashboard</h2>
     <Outlet/>
     <Footer/>
@@ -146,7 +102,7 @@ function ClientLayout() {
 }
 
 function Footer(){
-  return <footer>by Kate and Aly</footer>
+  return <footer className='fixed-bottom bg-light'>by Kate and Aly</footer>
 }
 
 export default App;

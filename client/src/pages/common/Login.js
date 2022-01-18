@@ -8,11 +8,10 @@ import { AuthContext } from "../../misc/AuthContext";
 
 
 function Login() {
+  let navigate = useNavigate();
+  const { setAuthState, setAuthRole } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setAuthState } = useContext(AuthContext);
-
-  let navigate = useNavigate();
 
   /* This will be different from the blog auth context because we will include the user role */
   const login = () => {
@@ -22,7 +21,9 @@ function Login() {
           alert(res.data.error);
       } else {
         localStorage.setItem("accessToken", res.data.token);
-        setAuthState(res.data.role);
+        setAuthState(true);
+      
+        setAuthRole(res.data.role);
         navigate('/');
       }
     });
@@ -54,4 +55,16 @@ function Login() {
   );
 }
 
-export default Login;
+function Logout(){
+    // let navigate = useNavigate();
+    const { setAuthState, setAuthRole } = useContext(AuthContext);
+
+
+    localStorage.removeItem("accessToken");
+    setAuthState(false);
+    setAuthRole(null);
+    
+    return null;
+}
+
+export { Login, Logout };
