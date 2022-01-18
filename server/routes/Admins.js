@@ -16,6 +16,39 @@ router.get("/approveUsers", validateAdminToken, async (req, res) => {
   res.json({ listOfUsers: listOfUsers });
 });
 
+/**
+ * Admins can disable users - not delete
+ * all that users accounts must be zeroed first
+ * params - admin logged in, user id to be disabled
+ */
+router.post("/disableUser", validateAdminToken, async (req, res) => {
+  const { userId } = req.body;
+  let data;
+  await Accounts.findAll({ where: { UserId: userId } })
+    .then((response) => {
+      data = response;
+    })
+    .catch((error) => {
+      return res.status(400).json(error);
+    });
+     
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].balance != 0) {
+      console.log(data.balance);
+      return res.status(400).json("cannot disable users with active balances");
+    }
+  }
+
+  Users.update({ activeStatus: "disabled" }, { where: { id: userId } })
+    .then((response) => {
+      Accounts.update({activeStatus: "disabled"}, {where: {UserId: userId}});
+      return res.json({ message: "User " + userId + " disabled" });
+    })
+    .catch((error) => {
+      return res.status(400).json(error);
+    });
+});
+
 /** this method needs an array of user ids ie [1,2,3]
  * it will set each user status to active
  */
@@ -67,10 +100,10 @@ router.put("/approveCreditAccounts", validateAdminToken, async (req, res) => {
     creditLimit: creditLimit,
     interestRate: interestRate,
     nextPaymentDueDate: date,
-    activeStatus: "active"
-  }
+    activeStatus: "active",
+  };
 
-  await Accounts.update(updateAccount, {where: {id: accountId}})
+  await Accounts.update(updateAccount, { where: { id: accountId } });
 
   res.json({ message: "Update Successful" });
 });

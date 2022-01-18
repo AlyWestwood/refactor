@@ -3,7 +3,7 @@ const router = express.Router();
 const { Users } = require("../models");
 const { Transactions, Accounts } = require("../models");
 const { validateToken } = require("../misc/authware");
-const axios = require('axios');
+const axios = require("axios");
 /**
  * gets transactions of specific account after verifying account can be accessed by logged in user
  *
@@ -49,7 +49,7 @@ router.get("/:transactionId", validateToken, async (req, res) => {
 router.post("/transferFunds", validateToken, async (req, res) => {
   const userId = req.userId;
   const { payerAccountId, payeeAccountId, originValue } = req.body;
-  if(payerAccountId === payeeAccountId){
+  if (payerAccountId === payeeAccountId) {
     return res.status(400).json("Cannot transfer funds to same account");
   }
   const originAccount = await Accounts.findOne({
@@ -57,18 +57,33 @@ router.post("/transferFunds", validateToken, async (req, res) => {
   });
   const targetAccount = await Accounts.findByPk(payeeAccountId);
 
-  if (!originAccount || !targetAccount || payerAccountId === 1 || payeeAccountId === 1) {
+  if (
+    !originAccount ||
+    !targetAccount ||
+    payerAccountId === 1 ||
+    payeeAccountId === 1 ||
+    originAccount.activeStatus !== "active" ||
+    targetAccount.activeStatus !== "active"
+  ) {
     return res.status(403).json("Cannot transfer funds with this account");
   }
 
   let targetValue;
-  if(targetAccount.currency !== originAccount.currency){
-    const url = "https://v6.exchangerate-api.com/v6/" + process.env.EXCHANGEAPIKEY + "/pair/"  + originAccount.currency + "/" + targetAccount.currency + "/" + originValue;
-    await  axios.get(url).then((response) => {
+  if (targetAccount.currency !== originAccount.currency) {
+    const url =
+      "https://v6.exchangerate-api.com/v6/" +
+      process.env.EXCHANGEAPIKEY +
+      "/pair/" +
+      originAccount.currency +
+      "/" +
+      targetAccount.currency +
+      "/" +
+      originValue;
+    await axios.get(url).then((response) => {
       targetValue = response.data.conversion_result;
       console.log(targetValue);
     });
-  }else{
+  } else {
     targetValue = originValue;
   }
 
@@ -95,21 +110,37 @@ router.post("/transferFunds", validateToken, async (req, res) => {
   if (originAccount.accountType === "debit") {
     if (Number(originAccount.balance) < originValue) {
       const transactionUpdate = { status: "denied" };
-      Transactions.update(transactionUpdate, { where: { id: transactionResult.id } });
+      Transactions.update(transactionUpdate, {
+        where: { id: transactionResult.id },
+      });
       return res.status(400).json("Insufficient funds");
     }
   }
   //in credit, balance is how much credit has been used up to the limit. so if the balance plus the transfer would be more than the limit, deny it
-  if(originAccount.accountType === "credit" && (Number(originAccount.balance) + originValue > originAccount.creditLimit)){
-      const transactionUpdate = { status: "denied" };
-      Transactions.update(transactionUpdate, { where: { id: transactionResult.id } });
-      return res.status(400).json("Insufficient funds");
+  if (
+    originAccount.accountType === "credit" &&
+    Number(originAccount.balance) + originValue > originAccount.creditLimit
+  ) {
+    const transactionUpdate = { status: "denied" };
+    Transactions.update(transactionUpdate, {
+      where: { id: transactionResult.id },
+    });
+    return res.status(400).json("Insufficient funds");
   }
 
-  const payerUpdate = {balance: (originAccount.accountType === "credit" ? Number(originAccount.balance) + transactionResult.originValue : Number(originAccount.balance) - transactionResult.originValue)};
+  const payerUpdate = {
+    balance:
+      originAccount.accountType === "credit"
+        ? Number(originAccount.balance) + transactionResult.originValue
+        : Number(originAccount.balance) - transactionResult.originValue,
+  };
 
-  const payeeUpdate = {balance: (targetAccount.accountType === "credit" ? Number(targetAccount.balance) - transactionResult.targetValue : Number(targetAccount.balance) + transactionResult.targetValue)};
-
+  const payeeUpdate = {
+    balance:
+      targetAccount.accountType === "credit"
+        ? Number(targetAccount.balance) - transactionResult.targetValue
+        : Number(targetAccount.balance) + transactionResult.targetValue,
+  };
 
   Accounts.update(payerUpdate, { where: { id: payerAccountId } })
     .then((result) => {
@@ -126,7 +157,9 @@ router.post("/transferFunds", validateToken, async (req, res) => {
       console.log(err);
     });
   const transactionUpdate = { status: "accepted" };
-  Transactions.update(transactionUpdate, { where: { id: transactionResult.id } });
+  Transactions.update(transactionUpdate, {
+    where: { id: transactionResult.id },
+  });
   return res.json("Transferred successfully");
 });
 

@@ -19,17 +19,19 @@ router.get("/getAccounts", validateToken, async (req, res) => {
 /**
  * params: logged in user, account id in url
  * returns: account requested
- * 
+ *
  * checks the logged in user can access the account, returns the account if correct
  */
 router.get("/singleAccount/:id", validateToken, async (req, res) => {
   const accountId = req.params.id;
-  const account = await Accounts.findOne({where: {UserId: req.userId, id: accountId}});
+  const account = await Accounts.findOne({
+    where: { UserId: req.userId, id: accountId },
+  });
 
   if (!account) {
     return res.status(404).json({ error: "No account found" });
   }
-  
+
   res.json({ account: account });
 });
 
@@ -66,6 +68,40 @@ router.post("/createAccount", validateToken, async (req, res) => {
     })
     .catch((error) => {
       res.status(400).json(error);
+    });
+});
+
+/**
+ * for a user to close one of their own accounts
+ *
+ * params: a logged in user, account id
+ *
+ */
+router.post("/closeAccount", validateToken, async (req, res) => {
+  const userId = req.userId;
+  const { accountId } = req.body;
+  const account = await Accounts.findOne({
+    where: { UserId: userId, id: accountId },
+  });
+
+  if (!account) {
+    return res.status(404).json("Cannot find the account");
+  }
+
+  if (account.activeStatus !== "active") {
+    return res.status(400).json("Cannot disabled inactive accounts");
+  }
+
+  if (account.balance != 0) {
+    return res.status(400).json("Cannot close accounts with a balance");
+  }
+
+  Accounts.update({ activeStatus: "disabled" }, { where: { id: accountId } })
+    .then((response) => {
+      return res.json("account " + accountId + " disabled");
+    })
+    .catch((error) => {
+      return res.json(error);
     });
 });
 
