@@ -20,9 +20,6 @@ router.get("/approveUsers", validateAdminToken, async (req, res) => {
  * it will set each user status to active
  */
 router.post("/approveUsers", validateAdminToken, async (req, res) => {
-  if (verifyAdmin(req.userId) !== true) {
-    res.status(403).json({ error: "Forbidden user" });
-  }
   //an arry of user ids
   const usersToApprove = req.body;
   let failedUpdates = [];
