@@ -38,7 +38,7 @@ router.post("/register", async (req, res) => {
     return res.status(400).json({ error: "SIN must be exactly 9 digits" });
   }
   user.activeStatus = "inactive";
-  user.role = "user";
+  user.role = "client";
 
   bcrypt.hash(password, 10).then((hash) => {
     user.password = hash;
@@ -83,13 +83,13 @@ router.post("/login", async (req, res) => {
 router.post("/auth", validateToken, async (req, res) => {
   const user = await Users.findByPk(req.userId);
   if (!user) {
-    res.status(403).json({ error: "No user found" });
+    res.status(403).json({ error: "No user found" });//
     return;
   }
   res.json({
     message: "Logged in",
     userId: user.id,
-    token: accessToken,
+    token: req.header("accessToken"),
     role: user.role,
   });
 });
