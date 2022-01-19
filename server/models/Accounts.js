@@ -41,10 +41,17 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: "inactive",
       allowNull: false,
     },
+    userId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'users',
+        key: 'id'
+      }
+    }
   });
 
   // Accounts.associate = (models) => {
-  //   Accounts.belongsTo(models.Users, { as: "user" });
+  //   Accounts.belongsTo(models.Users, { as: "userId" });
   // };
 
   Accounts.associate = (models) => {
