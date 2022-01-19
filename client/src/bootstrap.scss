@@ -8,7 +8,18 @@
 
 $primary: #8e59FF;
 $secondary: #2C3135;
+$min-contrast-ratio: 4;
+
+// buttons
 $btn-font-family: "Arial Rounded MT Bold";
+$btn-border-radius: .3rem;
+
+//cards
+$card-border-radius: 1em;
+$card-header-bg: purple;
+$card-cap-bg: $secondary;
+$card-cap-color: whitesmoke;
+$card-border-color: rgba(#000, .25);
 
 @import '~bootstrap/scss/bootstrap.scss';
 // scss-docs-start import-stack
