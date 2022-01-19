@@ -1,10 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './bootstrap.scss';
 import './App.css';
-import {BrowserRouter as Router, Route, Routes, Link, Outlet, Navigate} from 'react-router-dom';
-import axios from 'axios';
-import { AuthContext } from './misc/AuthContext'
+import { BrowserRouter as Router, Route, Routes, Outlet } from 'react-router-dom';
 import Home from './pages/common/Home';
 import { Login, Logout } from './pages/common/Login';
 import Register from './pages/common/Register.js';
