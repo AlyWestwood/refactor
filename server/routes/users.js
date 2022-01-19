@@ -73,10 +73,13 @@ router.post("/login", async (req, res) => {
     console.log(user);
     res.json({
       message: "Logged in",
-      userId: user.id,
       token: accessToken,
-      role: user.role,
-    });
+      user: {
+        id: user.id,
+        role: user.role,
+        status: user.activeStatus
+      }
+      });
   });
 });
 
@@ -88,10 +91,12 @@ router.post("/auth", validateToken, async (req, res) => {
   }
   res.json({
     message: "Logged in",
-    userId: user.id,
     token: req.header("accessToken"),
-    role: user.role,
-    activeStatus: user.activeStatus
+    user: {
+      id: user.id,
+      role: user.role,
+      status: user.activeStatus
+    }
   });
 });
 

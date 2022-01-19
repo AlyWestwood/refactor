@@ -25,7 +25,7 @@ app.use("/admin", adminsRouter);
 app.use("/accounts", accountsRouter);
 
 db.sequelize.sync().then(() => {
-    cron();
+    // cron();
     app.listen(process.env.PORT, () => {
     console.log("running on port " + process.env.PORT);
 });

@@ -2,11 +2,24 @@
  * View account info for client
  */
 
-import React from 'react';
-import {Link} from 'react-router-dom';
+import React, {useEffect} from 'react';
+import {Link, useContext } from 'react-router-dom';
 import { Card, Col, ListGroup } from 'react-bootstrap'
+import axios from 'axios';
+import { reqHeader } from '../../misc/reqHeader';
 
 function Account() {
+
+    useEffect(() => {
+        axios.get('/accounts/getAccounts', reqHeader).then(res => {
+            console.log(res.data)
+        })
+    }, [])
+
+
+
+
+
     return (
         <>
         <h1 className='text-start'>Accounts Overview</h1>
@@ -50,7 +63,7 @@ function Account() {
                     words
                 </Card.Header>
                 <Card.Body>
-                    <Link to='/openAccount'>Open a new account</Link>
+                    <Link to='/client/openAccount'>Open a new account</Link>
                     <Card.Text>
                         Grand total assets
                     </Card.Text>
