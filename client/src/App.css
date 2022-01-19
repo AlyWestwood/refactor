@@ -6,9 +6,9 @@
   color: white;
   text-decoration: none;
   border: thick solid white;
-  padding: .25em .5em;
+  padding: 0 .75em;
   margin: .5em;
-  border-radius: .5em;
+  border-radius: .3rem;
   font-family: 'Arial Rounded MT Bold';
 }
 .headerbtn:hover{

@@ -2,7 +2,7 @@
  * Open a new banking account
  */
 import React from 'react';
-import { Card, Form, Button } from 'react-bootstrap';
+import { Card, Form, Button, Row } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -29,7 +29,7 @@ const navigate = useNavigate();
 
     return (
         <>
-        <Card className='col-7 m-3'>
+        <Card className='col-5'>
             <Card.Header >Create a New Account</Card.Header>
             <Card.Body>
                 <Form onSubmit={createAccount}>

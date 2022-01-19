@@ -21,6 +21,7 @@ import GetAuth from './misc/GetAuth';
 import Footer from './components/Footer'
 import FileUpload from './FileUpload';
 import DisplayCheque from './DisplayCheque';
+import {Container, Row} from 'react-bootstrap';
 
 function App() {
 
@@ -44,13 +45,13 @@ function App() {
             <Route path="displayCheque" element={<DisplayCheque/>}/>
         {/* client routes */}
             {/* <Route path="client" element={<ClientLayout/>}>  */}
-              <Route path="account" element={<Account/>}/>
-              <Route path="chequedeposit" element={<Deposit/>}/>
-              {/* <Route path="/requestpayment" element={</>}/> */}
-              <Route path="paybills" element={<PayBills/>}/>
-              <Route path="transactions" element={<Transactions/>}/>
-              <Route path="transfer" element={<TransferC/>}/>
-              <Route path="openAccount" element={<NewAccountC/>}/>
+            <Route path="account" element={<Account/>}/>
+            <Route path="chequedeposit" element={<Deposit/>}/>
+            {/* <Route path="/requestpayment" element={</>}/> */}
+            <Route path="paybills" element={<PayBills/>}/>
+            <Route path="transactions" element={<Transactions/>}/>
+            <Route path="transfer" element={<TransferC/>}/>
+            <Route path="openAccount" element={<NewAccountC/>}/>
             {/* </Route> */}
 
         {/* admin routes */}
@@ -72,9 +73,11 @@ function Layout() {
   return (
     <>
       <Header />
-        <div className='container d-flex justify-content-center'>
+        <Container>
+        <Row className='my-4 gx-0 justify-content-md-center'>
           <Outlet/>
-        </div>
+        </Row>
+        </Container>
       <Footer/>
     </>
   )
