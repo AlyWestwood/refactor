@@ -1,6 +1,6 @@
 const { response } = require("express");
 const express = require("express");
-const { validateToken, validateAdminToken } = require("../misc/authware");
+const { validateAdminToken, validateAdminTokenDirect } = require("../misc/authware");
 const router = express.Router();
 const { Users } = require("../models");
 const { Accounts } = require("../models");
@@ -97,6 +97,25 @@ router.get("/approveCreditAccounts", validateAdminToken, async (req, res) => {
 
   res.json({ listOfInactiveCreditAccounts: listOfInactiveCreditAccounts });
 });
+
+router.get("/approveCheque/:id/:token", async (req, res) => {
+  
+})
+
+/**
+ * admin get cheque image - accessToken must be in the url
+ */
+router.get("/chequeImage/:chequeId/:token", async (req, res) => {
+  const token = req.params.token;
+  const validate = await validateAdminTokenDirect(token);
+
+  if(!validate){
+    return res.status(403).json("User not authenticated");
+  }
+
+  
+
+})
 
 router.put("/approveCreditAccounts", validateAdminToken, async (req, res) => {
   const { creditLimit, interestRate, accountId } = req.body;
