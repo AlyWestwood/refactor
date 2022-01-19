@@ -101,3 +101,23 @@ Aly
 
 3. Where do I need assistance? What do I need to figure out?
 - how to properly / effectively use contexts 
+
+Date
+Kate
+1. What I have done / not done since last Scrum?
+- s3 fleshed out 
+- cron jobs test working
+2. What I plan to do from this scrum to next? (next 24 hours)
+- scheduling email stuff
+- figure out if there are missing endpoints
+3. Where do I need assistance? What do I need to figure out?
+- good for now. promises were a challenge
+
+Aly
+1. What I have done / not done since last Scrum?
+- account page layout
+- styling intricacies - scss
+2. What I plan to do from this scrum to next? (next 24 hours)
+- get information on the accounts page
+3. Where do I need assistance? What do I need to figure out?
+- how to get all the information to the front end from accounts table joined with transactions into one react component
