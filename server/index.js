@@ -5,7 +5,7 @@ const cors = require('cors');
 
 const db = require('./models');
 
-// const {cron} = require("./crontest");
+const {cron} = require("./misc/cron");
 
 
 app.use(express.json())

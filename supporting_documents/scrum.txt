@@ -102,7 +102,7 @@ Aly
 3. Where do I need assistance? What do I need to figure out?
 - how to properly / effectively use contexts 
 
-Date
+19 Jan 2022
 Kate
 1. What I have done / not done since last Scrum?
 - s3 fleshed out 

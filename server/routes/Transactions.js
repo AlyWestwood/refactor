@@ -2,19 +2,10 @@ const express = require("express");
 const router = express.Router();
 const { Users } = require("../models");
 const { Transactions, Accounts, Cheques } = require("../models");
-const { validateToken } = require("../misc/authware");
-const axios = require("axios");
-const AWS = require("aws-sdk");
-const fs = require("fs");
-const multiparty = require("multiparty");
-const detect = require("detect-file-type");
-AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-});
+const { validateToken, validateTokenDirect, validateAdminTokenDirect } = require("../misc/authware");
 
-// Create S3 service object
-var s3 = new AWS.S3({ apiVersion: "2006-03-01" });
+const {uploadCheque, exchangeCurrency, downloadCheque} = require("../utils/utils");
+
 
 /**
  * gets transactions of specific account after verifying account can be accessed by logged in user
@@ -40,17 +31,21 @@ router.get("/byAccount/:accountId", validateToken, async (req, res) => {
  * params: transaction id
  * return: single transaction
  */
-router.get("/singleTransaction/:transactionId", validateToken, async (req, res) => {
-  const { transactionId } = req.params;
+router.get(
+  "/singleTransaction/:transactionId",
+  validateToken,
+  async (req, res) => {
+    const { transactionId } = req.params;
 
-  const transaction = await Transactions.findByPk(transactionId);
+    const transaction = await Transactions.findByPk(transactionId);
 
-  if (!transaction) {
-    return res.status(404).json("Transaction not found");
+    if (!transaction) {
+      return res.status(404).json("Transaction not found");
+    }
+
+    return res.json(transaction);
   }
-
-  return res.json(transaction);
-});
+);
 
 /**
  * post here when a user creates a transaction - requesting payment, transferring funds, paying fees
@@ -166,21 +161,42 @@ router.post("/transferFunds", validateToken, async (req, res) => {
  * cheques !!
  */
 
-router.get("/cheques/:chequeId", validateToken, async (req, res) => {
-  const userId = req.userId;
+router.get("/cheques/:chequeId/:accessToken", async (req, res) => {
+  // const userId = req.userId;
+  const accessToken = req.params.accessToken;
+  const validate = await validateTokenDirect(accessToken).catch((err) => {
+    console.log(err);
+  });
+  if(!validate){
+    return res.status(403).json("user not auth");
+  }
+  const userId = validate.userId;
+
   const chequeId = req.params.chequeId;
   const cheque = await Cheques.findByPk(chequeId);
   if(!cheque || (cheque.uploadedBy !== userId && cheque.payerAccountId!== userId)){
-    return res.status(403).json("User not authorized");
+    return res.status(403).json({error: "User not authorized", cheque: cheque,  validate: validate});
   }
-  
-  downloadFromS3(cheque.s3key).then((data) => {
-    
-    res.send(Buffer.from(data.Body).toString('base64'));
-  }).catch((error) =>{
-    console.log(error);
-  });
+
+//   downloadFromS3(chequeId)
+// .then((data) => {
+//   // downloadFromS3(cheque.s3key).then((data) => {
+
+//   // res.send(Buffer.from(data.Body).toString('base64'));
+//   res.header("Content-Type", "image/jpeg").send(data.Body);
+// })
+// .catch((error) => {
+//   console.log(error);
+// });
+
+downloadCheque(chequeId).then((result) => {
+  res.header("Content-Type", "image/jpeg").send(result.Body);
+}).catch((err) => {
+  console.log("after download cheque");
+  console.log("err" + err)
+  res.status(400).json(err);
 })
+});
 
 router.post("/depositCheque", validateToken, async (req, res) => {
   const uploadResult = await uploadCheque(req);
@@ -261,76 +277,7 @@ router.post("/depositCheque", validateToken, async (req, res) => {
     });
 });
 
-async function uploadCheque(req) {
-  return await new Promise((resolve, reject) => {
-    const form = new multiparty.Form();
-    form.parse(req, async (error, fields, files) => {
-      if (error) {
-        reject(error);
-      }
-      try {
-        const path = files.file[0].path;
-        const buffer = fs.readFileSync(path);
-        let type = "jpg";
-        await detect.fromBuffer(buffer, (err, result) => {
-          type = result.ext;
-        });
-        const fileName = `cheques/${Date.now().toString()}`;
-        const data = await uploadToS3(buffer, fileName, type);
-        console.log(data);
-        resolve(data);
-      } catch (err) {
-        console.log(err);
-        reject(err);
-      }
-    });
-  });
-}
 
-const downloadFromS3 = async (key) => {
-  const downloadParams = {
-    Bucket: process.env.S3BUCKET,
-    Key: key,
-  }
-
-  return await s3.getObject(downloadParams).promise();
-}
-
-const uploadToS3 = async (buffer, name, type) => {
-  const uploadParams = {
-    Bucket: process.env.S3BUCKET,
-    Key: name + "." + type,
-    Body: buffer,
-  };
-
-  // call S3 to retrieve upload file to specified bucket
-  return await s3.upload(uploadParams).promise();
-};
-
-const exchangeCurrency = async (originCurrency, targetCurrency, value) => {
-  return await new Promise((resolve, reject) => {
-    if (targetCurrency !== originCurrency) {
-      const url =
-        "https://v6.exchangerate-api.com/v6/" +
-        process.env.EXCHANGEAPIKEY +
-        "/pair/" +
-        originCurrency +
-        "/" +
-        targetCurrency +
-        "/" +
-        value;
-      axios
-        .get(url)
-        .then((response) => {
-          console.log(response.data.conversion_result);
-          resolve(response.data.conversion_result);
-        })
-        .catch((err) => reject(err));
-    } else {
-      resolve(value);
-    }
-  });
-};
 /**
  * request payment
  * params: value (value is in payee account currency), payer account (account to send money), payee account (requester, logged in user)
