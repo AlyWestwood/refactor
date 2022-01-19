@@ -33,11 +33,7 @@ module.exports = (sequelize, DataTypes) => {
 
 
   Transactions.associate = (models) => {
-    Transactions.belongsTo(models.Cheques, {
-      foreignKey: {
-        allowNull: true,
-      },
-    });
+    Transactions.belongsTo(models.Cheques, {allowNull: true, foreignKey: "chequeId"});
   };
 
   Transactions.associate = (models) => {
@@ -47,6 +43,8 @@ module.exports = (sequelize, DataTypes) => {
   Transactions.associate = (models) => {
     Transactions.belongsTo(models.Accounts, { as: "payerAccount" });
   };
+
+
 
   return Transactions;
 };

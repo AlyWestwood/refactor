@@ -48,6 +48,10 @@ module.exports = (sequelize, DataTypes) => {
     Users.associate = (models) => {
       Users.hasMany(models.Accounts, {as: 'userId'});
     };
+
+    Users.associate = (models) => {
+      Users.hasMany(models.Cheques, {foreignKey: 'uploadedBy', allowNull: false});
+    };
   
     return Users;
   };
