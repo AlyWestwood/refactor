@@ -25,7 +25,7 @@ function LoggedOut(){
 
 function Client(){
     return (
-        <Nav.Link href="/account">Accounts</Nav.Link>
+        <Nav.Link href="/client/account">Accounts</Nav.Link>
     )
 }
 
@@ -57,9 +57,16 @@ function Header() {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="me-auto">
-                    {state.authRole === "client" && <Client/>}
-                    {state.authRole === "admin" && <Admin/>}
-                    {state.authRole === null && <NoAuth/>}
+                    {/* {state.authState ? 
+                        state.authUser ? 
+                            state.authUser.role === "client" && <Client/> ||
+                            state.authUser.role === "admin" && <Admin/>
+                        : <div>Loading...</div>
+                    : <NoAuth/>
+                    } */}
+                    {state.authUser.role === null && <NoAuth/>}
+                    {state.authUser.role === "client" && <Client/>}
+                    {state.authUser.role === "admin" && <Admin/>}
                 </Nav>
                 </Navbar.Collapse>
             </Navbar>

@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useContext } from 'react';
 import './bootstrap.scss';
 import './App.css';
-import { BrowserRouter as Router, Route, Routes, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Outlet, Navigate } from 'react-router-dom';
 import Home from './pages/common/Home';
 import { Login, Logout } from './pages/common/Login';
 import Register from './pages/common/Register.js';
@@ -20,6 +20,7 @@ import Footer from './components/Footer'
 import FileUpload from './FileUpload';
 import DisplayCheque from './DisplayCheque';
 import {Container, Row} from 'react-bootstrap';
+import { AuthContext } from './misc/AuthContext';
 
 function App() {
 
@@ -42,21 +43,22 @@ function App() {
             <Route path="fileUpload" element={<FileUpload/>}/>
             <Route path="displayCheque" element={<DisplayCheque/>}/>
         {/* client routes */}
-            {/* <Route path="client" element={<ClientLayout/>}>  */}
-            <Route path="account" element={<Account/>}/>
-            <Route path="chequedeposit" element={<Deposit/>}/>
-            {/* <Route path="/requestpayment" element={</>}/> */}
-            <Route path="paybills" element={<PayBills/>}/>
-            <Route path="transactions" element={<Transactions/>}/>
-            <Route path="transfer" element={<TransferC/>}/>
-            <Route path="openAccount" element={<NewAccountC/>}/>
-            {/* </Route> */}
+            <Route path="client" element={<Client/>}>
+              {/* <Route path="/" element={<ClientHome/>}/> */}
+                <Route path="account" element={<Account/>}/>
+                <Route path="chequedeposit" element={<Deposit/>}/>
+                {/* <Route path="/requestpayment" element={</>}/> */}
+                <Route path="paybills" element={<PayBills/>}/>
+                <Route path="transactions" element={<Transactions/>}/>
+                <Route path="transfer" element={<TransferC/>}/>
+                <Route path="openAccount" element={<NewAccountC/>}/>
+            </Route>
 
         {/* admin routes */}
-          {/* <Route path="admin" element={<AdminLayout/>}> */}
+          <Route path="admin" element={<Admin/>}>
             <Route path="transfer" element={<TransferA/>}/>
             <Route path="openAccount" element={<NewAccountA/>}/>
-          {/* </Route> */}
+          </Route>
         </Route>
 
         </Routes>
@@ -81,30 +83,22 @@ function Layout() {
   )
 }
 
-// const logout = function(){
-//   localStorage.removeItem("accessToken");
-//   Navigate("/");
-// }
+function Admin() {
+  const state = useContext(AuthContext);
+  console.log(state)
+  return state.authState === null ? 
+    <div>Loading...</div> : state.authRole === null ? 
+    <div>Loading...</div> : state.authRole === 'admin' ? 
+    <Outlet/> : <Navigate to='/login'/>
+  
+}
 
-// function AdminLayout() {
-//   return (
-//     <div>
-//       <Header />
-//     <h2>Admin Dashboard</h2>
-//     <Outlet/>
-//     <Footer/>
-//     </div>
-//   )
-// }
-
-// function ClientLayout() {
-//   return (
-//     <div>
-//     <h2>Admin Dashboard</h2>
-//     <Outlet/>
-//     </div>
-//   )
-// }
-
+function Client() {
+  const state = useContext(AuthContext);
+  return state.authState === null ? 
+    <div>Loading...</div> : state.authUser.role === null ? 
+    <div>Loading...</div> : state.authUser.role === 'client' ? 
+    <Outlet/> : <Navigate to='/login'/>
+}
 
 export default App;

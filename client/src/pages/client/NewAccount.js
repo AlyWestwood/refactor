@@ -5,6 +5,7 @@ import React from 'react';
 import { Card, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { reqHeader } from '../../misc/reqHeader';
 
 function NewAccount() {
 
@@ -16,10 +17,7 @@ const navigate = useNavigate();
             currency: submit.target.currency.value
         }
         console.log(account);
-        axios.post('/accounts/createAccount', account, {
-        headers: {
-            accessToken: localStorage.getItem("accessToken")
-          }}).then(res => {
+        axios.post('/accounts/createAccount', account, reqHeader).then(res => {
             alert(res.data.message);
             navigate('/');
         }).catch(err => {

@@ -9,7 +9,7 @@ import { AuthContext } from "../../misc/AuthContext";
 
 function Login() {
   let navigate = useNavigate();
-  const { setAuthState, setAuthRole } = useContext(AuthContext);
+  const { setAuthState, setAuthUser } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -22,8 +22,7 @@ function Login() {
       } else {
         localStorage.setItem("accessToken", res.data.token);
         setAuthState(true);
-      
-        setAuthRole(res.data.role);
+        setAuthUser(res.data.user);
         navigate('/');
       }
     });

@@ -1,37 +1,34 @@
 import {useState, useEffect} from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
+import { reqHeader } from './reqHeader';
 
 
 function GetAuth({children}) {
-const [authState, setAuthState] = useState(false);
-const [authRole, setAuthRole] = useState("");
+const [authState, setAuthState] = useState(null);
+const [authUser, setAuthUser] = useState({id: null, role: null, status: null});//
     
     /* authorization */
 
 useEffect(()=>{
-  axios.post("/users/auth", {}, {
-    headers: {
-      accessToken: localStorage.getItem("accessToken")
-    }
-  }).then(res => {
+  axios.post("/users/auth", {}, reqHeader).then(res => {
     setAuthState(true);
     
-    if(res.data.role){
-      setAuthRole(res.data.role);
+    if(res.data.user){
+      setAuthUser(res.data.user);
     } else {
       setAuthState(false);
-      setAuthRole(null)
+      setAuthUser(null)
     }
   }).catch(err => {
     // console.log(err.response.data.error);
     setAuthState(false);
-    setAuthRole(null);
+    setAuthUser(null);
   });
 }, []);
- 
+
   return (
-    <AuthContext.Provider value={{authState, setAuthState, authRole, setAuthRole}}>
+    <AuthContext.Provider value={{authState, setAuthState, authUser, setAuthUser}}>
       {children}
     </AuthContext.Provider>
   )
