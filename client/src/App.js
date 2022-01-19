@@ -18,6 +18,8 @@ import Transactions from './pages/client/Transactions';
 import TransferC from './pages/client/Transfer';
 import Header from './pages/common/Header';
 import GetAuth from './misc/GetAuth';
+import FileUpload from './FileUpload';
+import DisplayCheque from './DisplayCheque';
 
 function App() {
 
@@ -37,6 +39,8 @@ function App() {
             <Route path="login" element={<Login/>}/>
             <Route path="logout" element={<Logout/>}/>
             <Route path="register" element={<Register/>}/>
+            <Route path="fileUpload" element={<FileUpload/>}/>
+            <Route path="displayCheque" element={<DisplayCheque/>}/>
           </Route>
         {/* client routes */}
           <Route path="client" element={<ClientLayout/>}> 

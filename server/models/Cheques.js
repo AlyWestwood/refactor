@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
         primaryKey: true,
       },
-      imagePath: {
+      s3key: {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
@@ -17,12 +17,22 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("cleared", "on hold", "bounced"),
         allowNull: false,
       },
+      transactionId: {
+        type: DataTypes.INTEGER,
+      },
+      chequeNumber: {
+        type: DataTypes.INTEGER,
+      },
     });
   
     Cheques.associate = (models) => {
-        Cheques.hasOne(models.Transactions);
+        Cheques.hasOne(models.Transactions, {foreignKey: "chequeNumber"});
     };
-  
+
+    Cheques.associate = (models) => {
+      Cheques.belongsTo(models.Accounts, {as: 'payerAccount'});
+  }
+
     return Cheques;
   };
   

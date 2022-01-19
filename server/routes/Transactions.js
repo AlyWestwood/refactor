@@ -1,14 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const { Users } = require("../models");
-const { Transactions, Accounts } = require("../models");
+const { Transactions, Accounts, Cheques } = require("../models");
 const { validateToken } = require("../misc/authware");
 const axios = require("axios");
-var AWS = require('aws-sdk');
+const AWS = require("aws-sdk");
+const fs = require("fs");
+const multiparty = require("multiparty");
+const detect = require("detect-file-type");
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 });
+
+// Create S3 service object
+var s3 = new AWS.S3({ apiVersion: "2006-03-01" });
 
 /**
  * gets transactions of specific account after verifying account can be accessed by logged in user
@@ -74,24 +80,11 @@ router.post("/transferFunds", validateToken, async (req, res) => {
     return res.status(403).json("Cannot transfer funds with this account");
   }
 
-  let targetValue;
-  if (targetAccount.currency !== originAccount.currency) {
-    const url =
-      "https://v6.exchangerate-api.com/v6/" +
-      process.env.EXCHANGEAPIKEY +
-      "/pair/" +
-      originAccount.currency +
-      "/" +
-      targetAccount.currency +
-      "/" +
-      originValue;
-    await axios.get(url).then((response) => {
-      targetValue = response.data.conversion_result;
-      console.log(targetValue);
-    });
-  } else {
-    targetValue = originValue;
-  }
+  const targetValue = await exchangeCurrency(
+    originAccount.currency,
+    targetAccount.currency,
+    originValue
+  );
 
   const transaction = {
     originValue: originValue,
@@ -169,48 +162,175 @@ router.post("/transferFunds", validateToken, async (req, res) => {
   return res.json("Transferred successfully");
 });
 
-
-
 /**
  * cheques !!
  */
 
-
-router.post("/upload", (req, res) => {
-    const {fileName} = req.body;
-    // Create S3 service object
-    var s3 = new AWS.S3({apiVersion: '2006-03-01'});
+router.get("/cheques/:chequeId", validateToken, async (req, res) => {
+  const userId = req.userId;
+  const chequeId = req.params.chequeId;
+  const cheque = await Cheques.findByPk(chequeId);
+  if(!cheque || (cheque.uploadedBy !== userId && cheque.payerAccountId!== userId)){
+    return res.status(403).json("User not authorized");
+  }
+  
+  downloadFromS3(cheque.s3key).then((data) => {
     
-    // call S3 to retrieve upload file to specified bucket
-    var uploadParams = {Bucket: process.env.S3BUCKET, Key: '', Body: ''};
-    var file = "test/" + fileName;
-    
-    // Configure the file stream and obtain the upload parameters
-    var fs = require('fs');
-    var fileStream = fs.createReadStream(file);
-    fileStream.on('error', function(err) {
-      console.log('File Error', err);
-    });
-    uploadParams.Body = fileStream;
-    var path = require('path');
-    uploadParams.Key = path.basename(file);
-    
-    // call S3 to retrieve upload file to specified bucket
-    s3.upload (uploadParams, function (err, data) {
-      if (err) {
-        console.log("Error", err);
-      } if (data) {
-        console.log("Upload Success", data.Location);
-      }
-    });
-    
-
-    res.json("completed");
+    res.send(Buffer.from(data.Body).toString('base64'));
+  }).catch((error) =>{
+    console.log(error);
+  });
 })
 
+router.post("/depositCheque", validateToken, async (req, res) => {
+  const uploadResult = await uploadCheque(req);
+  console.log(uploadResult);
+  if (!uploadResult) {
+    return res.status(400).json({ error: "could not record cheque" });
+  }
+  const tempData = {
+    payeeAccountId: 4,
+    payerAccountId: 3,
+    value: 27,
+    chequeNumber: 234,
+  };
+  const { payeeAccountId, payerAccountId, value, chequeNumber } = tempData;
+  // const { payeeAccountId, payerAccountId, value} = req.body;
+  const targetAccount = await Accounts.findOne({
+    where: { id: payeeAccountId, UserId: req.userId },
+  });
+  const originAccount = await Accounts.findByPk(payerAccountId);
 
+  if (
+    !originAccount ||
+    !targetAccount ||
+    originAccount.accountType === "credit" ||
+    payeeAccountId === payerAccountId
+  ) {
+    return res.status(403).json("Unable to transfer to that account");
+  }
+  const duplicateCheques = await Cheques.findAll({
+    where: { payerAccountId: payerAccountId, chequeNumber: chequeNumber },
+  });
+  if (duplicateCheques) {
+    for (let i = 0; i < duplicateCheques.length; i++) {
+      if (duplicateCheques[i].status !== "on hold") {
+        return res.status(400).json("That check has already been deposited");
+      }
+    }
+  }
 
+  const chequeData = {
+    s3key: uploadResult.key,
+    uploadDate: new Date(),
+    status: "on hold",
+    uploadedBy: req.userId,
+    payerAccountId: payerAccountId,
+  };
+  let chequeId;
+  const cheque = await Cheques.create(chequeData).then(
+    (response) => (chequeId = response.id)
+  );
+  const targetValue = await exchangeCurrency(
+    originAccount.currency,
+    targetAccount.currency,
+    value
+  );
 
+  console.log(chequeId);
+  const transactionData = {
+    originValue: value,
+    targetValue: targetValue,
+    originCurrency: originAccount.currency,
+    targetCurrency: targetAccount.currency,
+    transactionDate: new Date(),
+    status: "pending",
+    payeeAccountId: payeeAccountId,
+    payerAccountId: payerAccountId,
+    chequeId: chequeId,
+  };
+
+  //the cheque will stay on hold and the transaction pending until an admin reviews it and approves it.
+  await Transactions.create(transactionData)
+    .then((result) => {
+      Cheques.update({ transactionId: result.id }, { where: { id: chequeId } });
+      return res.json(result);
+    })
+    .catch((error) => {
+      return res.status(400).json(error);
+    });
+});
+
+async function uploadCheque(req) {
+  return await new Promise((resolve, reject) => {
+    const form = new multiparty.Form();
+    form.parse(req, async (error, fields, files) => {
+      if (error) {
+        reject(error);
+      }
+      try {
+        const path = files.file[0].path;
+        const buffer = fs.readFileSync(path);
+        let type = "jpg";
+        await detect.fromBuffer(buffer, (err, result) => {
+          type = result.ext;
+        });
+        const fileName = `cheques/${Date.now().toString()}`;
+        const data = await uploadToS3(buffer, fileName, type);
+        console.log(data);
+        resolve(data);
+      } catch (err) {
+        console.log(err);
+        reject(err);
+      }
+    });
+  });
+}
+
+const downloadFromS3 = async (key) => {
+  const downloadParams = {
+    Bucket: process.env.S3BUCKET,
+    Key: key,
+  }
+
+  return await s3.getObject(downloadParams).promise();
+}
+
+const uploadToS3 = async (buffer, name, type) => {
+  const uploadParams = {
+    Bucket: process.env.S3BUCKET,
+    Key: name + "." + type,
+    Body: buffer,
+  };
+
+  // call S3 to retrieve upload file to specified bucket
+  return await s3.upload(uploadParams).promise();
+};
+
+const exchangeCurrency = async (originCurrency, targetCurrency, value) => {
+  return await new Promise((resolve, reject) => {
+    if (targetCurrency !== originCurrency) {
+      const url =
+        "https://v6.exchangerate-api.com/v6/" +
+        process.env.EXCHANGEAPIKEY +
+        "/pair/" +
+        originCurrency +
+        "/" +
+        targetCurrency +
+        "/" +
+        value;
+      axios
+        .get(url)
+        .then((response) => {
+          console.log(response.data.conversion_result);
+          resolve(response.data.conversion_result);
+        })
+        .catch((err) => reject(err));
+    } else {
+      resolve(value);
+    }
+  });
+};
 /**
  * request payment
  * params: value (value is in payee account currency), payer account (account to send money), payee account (requester, logged in user)
