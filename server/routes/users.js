@@ -91,6 +91,7 @@ router.post("/auth", validateToken, async (req, res) => {
     userId: user.id,
     token: req.header("accessToken"),
     role: user.role,
+    activeStatus: user.activeStatus
   });
 });
 

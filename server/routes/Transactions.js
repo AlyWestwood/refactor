@@ -22,7 +22,7 @@ var s3 = new AWS.S3({ apiVersion: "2006-03-01" });
  * params: logged in user, account id in url
  * returns: all transactions of the account - deposits and withdrawls
  */
-router.get("/:accountId", validateToken, async (req, res) => {
+router.get("/byAccount/:accountId", validateToken, async (req, res) => {
   const accountId = req.params.accountId;
   const account = await Accounts.findOne({ where: { UserId: req.userId } });
   if (!account) {
@@ -40,7 +40,7 @@ router.get("/:accountId", validateToken, async (req, res) => {
  * params: transaction id
  * return: single transaction
  */
-router.get("/:transactionId", validateToken, async (req, res) => {
+router.get("/singleTransaction/:transactionId", validateToken, async (req, res) => {
   const { transactionId } = req.params;
 
   const transaction = await Transactions.findByPk(transactionId);
