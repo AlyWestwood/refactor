@@ -15,3 +15,8 @@
   color: theme-color("primary");
   background-color: white;
 }
+
+footer {
+  color: #717B84;
+  border: 2px solid #DADADA;
+}

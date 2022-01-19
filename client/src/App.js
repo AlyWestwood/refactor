@@ -12,12 +12,13 @@ import NewAccountA from './pages/admin/NewAccount';
 import TransferA from './pages/admin/Transfer';
 import Account from './pages/client/Account';
 import Deposit from './pages/client/Deposit';
-import NewAccountC from './pages/client/Account';
+import NewAccountC from './pages/client/NewAccount';
 import PayBills from './pages/client/PayBills';
 import Transactions from './pages/client/Transactions';
 import TransferC from './pages/client/Transfer';
-import Header from './pages/common/Header';
+import Header from './components/Header';
 import GetAuth from './misc/GetAuth';
+import Footer from './components/Footer'
 
 function App() {
 
@@ -37,22 +38,22 @@ function App() {
             <Route path="login" element={<Login/>}/>
             <Route path="logout" element={<Logout/>}/>
             <Route path="register" element={<Register/>}/>
-          </Route>
         {/* client routes */}
-          <Route path="client" element={<ClientLayout/>}> 
-            <Route path="account" element={<Account/>}/>
-            <Route path="chequedeposit" element={<Deposit/>}/>
-            {/* <Route path="/requestpayment" element={</>}/> */}
-            <Route path="paybills" element={<PayBills/>}/>
-            <Route path="transactions" element={<Transactions/>}/>
-            <Route path="transfer" element={<TransferC/>}/>
-            <Route path="openAccount" element={<NewAccountC/>}/>
-          </Route>
+            {/* <Route path="client" element={<ClientLayout/>}>  */}
+              <Route path="account" element={<Account/>}/>
+              <Route path="chequedeposit" element={<Deposit/>}/>
+              {/* <Route path="/requestpayment" element={</>}/> */}
+              <Route path="paybills" element={<PayBills/>}/>
+              <Route path="transactions" element={<Transactions/>}/>
+              <Route path="transfer" element={<TransferC/>}/>
+              <Route path="openAccount" element={<NewAccountC/>}/>
+            {/* </Route> */}
 
         {/* admin routes */}
-        <Route path="admin" element={<AdminLayout/>}>
-          <Route path="transfer" element={<TransferA/>}/>
-          <Route path="openAccount" element={<NewAccountA/>}/>
+          {/* <Route path="admin" element={<AdminLayout/>}> */}
+            <Route path="transfer" element={<TransferA/>}/>
+            <Route path="openAccount" element={<NewAccountA/>}/>
+          {/* </Route> */}
         </Route>
 
         </Routes>
@@ -65,12 +66,13 @@ function App() {
 function Layout() {
   // console.log(authState)
   return (
-    <div>
+    <>
       <Header />
-      <div className='container d-flex justify-content-center'><Outlet/></div>
-    
-    <Footer/>
-    </div>
+        <div className='container d-flex justify-content-center'>
+          <Outlet/>
+        </div>
+      <Footer/>
+    </>
   )
 }
 
@@ -79,30 +81,25 @@ function Layout() {
 //   Navigate("/");
 // }
 
-function AdminLayout() {
-  return (
-    <div>
-      <Header />
-    <h2>Admin Dashboard</h2>
-    <Outlet/>
-    <Footer/>
-    </div>
-  )
-}
+// function AdminLayout() {
+//   return (
+//     <div>
+//       <Header />
+//     <h2>Admin Dashboard</h2>
+//     <Outlet/>
+//     <Footer/>
+//     </div>
+//   )
+// }
 
-function ClientLayout() {
-  return (
-    <div>
-      <Header />
-    <h2>Admin Dashboard</h2>
-    <Outlet/>
-    <Footer/>
-    </div>
-  )
-}
+// function ClientLayout() {
+//   return (
+//     <div>
+//     <h2>Admin Dashboard</h2>
+//     <Outlet/>
+//     </div>
+//   )
+// }
 
-function Footer(){
-  return <footer className='fixed-bottom bg-light'>by Kate and Aly</footer>
-}
 
 export default App;
