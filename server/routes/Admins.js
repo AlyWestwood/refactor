@@ -66,7 +66,7 @@ router.put("/enableUser", validateAdminToken, (req, res) => {
 /** this method needs an array of user ids ie [1,2,3]
  * it will set each user status to active
  */
-router.post("/approveUsers", validateAdminToken, async (req, res) => {
+router.put("/approveUsers", validateAdminToken, async (req, res) => {
   //an arry of user ids
   const usersToApprove = req.body;
   let failedUpdates = [];
