@@ -29,22 +29,35 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM("requested", "pending", "accepted", "denied"),
       allowNull: false,
     },
+    chequeId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Cheques',
+        key: 'id',
+      }
+    },
+    recurringPaymentId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'RecurringPayments',
+        key: 'id',
+      }
+    },
+    payerAccount: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Accounts',
+        key: 'id',
+      }
+    },
+    payeeAccount: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Accounts',
+        key: 'id',
+      },
+    }
   });
-
-
-  Transactions.associate = (models) => {
-    Transactions.belongsTo(models.Cheques, {allowNull: true, foreignKey: "chequeId"});
-  };
-
-  Transactions.associate = (models) => {
-    Transactions.belongsTo(models.Accounts, { as: "payeeAccount" });
-  };
-
-  Transactions.associate = (models) => {
-    Transactions.belongsTo(models.Accounts, { as: "payerAccount" });
-  };
-
-
 
   return Transactions;
 };

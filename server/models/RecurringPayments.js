@@ -14,16 +14,24 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      payerAccount: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: 'Accounts',
+          key: 'id',
+        },
+        allowNull: false,
+      },
+      payeeAccount: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: 'Accounts',
+          key: 'id',
+        },
+        allowNull: false,
+      }
     });
-  
-    RecurringPayments.associate = (models) => {
-        RecurringPayments.belongsTo(models.Accounts, {as: 'payeeAccount'})
-    }
-
-    RecurringPayments.associate = (models) => {
-        RecurringPayments.belongsTo(models.Accounts, {as: 'payerAccount'});
-    }
-  
+    
     return RecurringPayments;
   };
   

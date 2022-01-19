@@ -17,21 +17,27 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("cleared", "on hold", "bounced"),
         allowNull: false,
       },
-      transactionId: {
-        type: DataTypes.INTEGER,
-      },
       chequeNumber: {
         type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      payerAccount: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: 'Accounts',
+          key: 'id',
+        },
+        allowNull: false,
+      },
+      payeeAccount: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: 'Accounts',
+          key: 'id',
+        },
+        allowNull: false,
       },
     });
-  
-    Cheques.associate = (models) => {
-        Cheques.hasOne(models.Transactions, {foreignKey: "chequeNumber"});
-    };
-
-    Cheques.associate = (models) => {
-      Cheques.belongsTo(models.Accounts, {as: 'payerAccount'});
-  }
 
     return Cheques;
   };

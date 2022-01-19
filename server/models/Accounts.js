@@ -41,27 +41,15 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: "inactive",
       allowNull: false,
     },
+    userId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id',
+      },
+      allowNull: false,
+    }
   });
-
-  // Accounts.associate = (models) => {
-  //   Accounts.belongsTo(models.Users, { as: "user" });
-  // };
-
-  Accounts.associate = (models) => {
-    Accounts.hasMany(models.Transactions, { foreignKey: "payerAccountId" });
-  };
-
-  Accounts.associate = (models) => {
-    Accounts.hasMany(models.Transactions, { foreignKey: "payeeAccountId" });
-  };
-
-  // Accounts.associate = (models) => {
-  //   Accounts.hasMany(models.RecurringPayments, { foreignKey: "withdrawlAccountId" });
-  // };
-
-  // Accounts.associate = (models) => {
-  //   Accounts.hasMany(models.RecurringPayments, { foreignKey: "depositAccount" });
-  // };
 
   return Accounts;
 };
