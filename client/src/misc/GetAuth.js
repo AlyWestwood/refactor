@@ -18,12 +18,12 @@ useEffect(()=>{
       setAuthUser(res.data.user);
     } else {
       setAuthState(false);
-      setAuthUser(null)
+      setAuthUser({id: null, role: null, status: null})
     }
   }).catch(err => {
     // console.log(err.response.data.error);
     setAuthState(false);
-    setAuthUser(null);
+    setAuthUser({id: null, role: null, status: null});
   });
 }, []);
 

@@ -44,7 +44,7 @@ function App() {
             <Route path="displayCheque" element={<DisplayCheque/>}/>
         {/* client routes */}
             <Route path="client" element={<Client/>}>
-              {/* <Route path="/" element={<ClientHome/>}/> */}
+              <Route path="" element={<ClientHome/>}/>
                 <Route path="account" element={<Account/>}/>
                 <Route path="chequedeposit" element={<Deposit/>}/>
                 {/* <Route path="/requestpayment" element={</>}/> */}
@@ -98,7 +98,13 @@ function Client() {
   return state.authState === null ? 
     <div>Loading...</div> : state.authUser.role === null ? 
     <div>Loading...</div> : state.authUser.role === 'client' ? 
-    <Outlet/> : <Navigate to='/login'/>
+    state.authUser.status === 'active' ?
+      <Outlet /> : <div>Sit tight!<br/>You haven't been approved yet</div> :
+    <Navigate to='/login'/>
+}
+
+function ClientHome(){
+  return <div>Welcome</div>
 }
 
 export default App;

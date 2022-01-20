@@ -14,7 +14,7 @@ function DisplayAccount({value}){
     useEffect(() => {
         axios.get(`/transactions/byAccount/${value.id}`, reqHeader)
         .then(res => {
-            // console.log(res.data);
+            console.log(res.data);
             setTransactionList(res.data);
             // console.log(transactionList)
         })
