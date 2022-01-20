@@ -39,6 +39,7 @@ router.post("/register", async (req, res) => {
   }
   user.activeStatus = "inactive";
   user.role = "client";
+  delete user.confirmPassword;
 
   bcrypt.hash(password, 10).then((hash) => {
     user.password = hash;

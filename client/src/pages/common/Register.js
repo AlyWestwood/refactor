@@ -6,6 +6,7 @@ import {Formik, Form, Field, ErrorMessage} from 'formik';
 import * as yup from 'yup';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Row, Col } from 'react-bootstrap';
 
 
 function Register() {
@@ -26,7 +27,8 @@ function Register() {
         birthdate: yup.date().required(),
         sin: yup.string().matches(/[0-9]{9}/, "sin must be exactly 9 digits").required(),
         email: yup.string().email().required(),
-        password: yup.string().min(4).max(50).required()
+        password: yup.string().min(4).max(50).required(),
+        confirmPassword: yup.string().oneOf([yup.ref('password')], 'Passwords must match').required()
     });
 
     const onSubmit = newUser => {
@@ -41,14 +43,17 @@ function Register() {
     const navigate = useNavigate();
 
     return (
-        <div className='col-5'>
+        <div className='col-8 card'>
+          <div className='card-header'>Register</div>
         <Formik
           initialValues={initialValues}
           onSubmit={onSubmit}
           validationSchema={validationSchema}
         >
-          <Form className="formContainer">
-            <div className='mb-3'>
+          <Form className="formContainer card-body">
+            <Row className='mb-3'>
+
+            <Col>
             <label className='form-label'>First Name: </label>
             <Field
               className="inputNewEntry form-control"
@@ -57,9 +62,9 @@ function Register() {
               placeholder="(Ex. Jane)"
             />
             <ErrorMessage name="firstName" render={msg => <span class="text-danger">{msg}</span>} />
-            </div>
+            </Col>
 
-            <div className='mb-3'>
+            <Col>
             <label className='form-label'>Last Name: </label>
             <Field
               className="inputNewEntry form-control"
@@ -68,9 +73,10 @@ function Register() {
               placeholder="(Ex. Doe)"
             />
             <ErrorMessage name="lastName" render={msg => <span class="text-danger">{msg}</span>} />
-            </div>
-            
-            <div className='mb-3'>
+            </Col>
+            </Row>
+            <Row className='mb-3'>
+            <Col>
             <label className='form-label'>Phone: </label>
             <Field
               className="inputNewEntry form-control"
@@ -79,10 +85,8 @@ function Register() {
               placeholder="(Ex. John123...)"
             />
             <ErrorMessage name="phone" render={msg => <span class="text-danger">{msg}</span>} />
-            </div>
-            
-            <div className='mb-3'>
-
+            </Col>
+            <Col>
             <label className='form-label'>Birthdate: </label>
             <Field
               className="inputNewEntry form-control"
@@ -90,9 +94,10 @@ function Register() {
               type="date"
             />
             <ErrorMessage name="birthdate" render={msg => <span class="text-danger">{msg}</span>} />
-            </div>
-            
-            <div className='mb-3'>
+            </Col>
+            </Row>
+            <Row className='mb-3'>
+            <Col>
             <label className='form-label'>SIN: </label>
             <Field
               className="inputNewEntry form-control"
@@ -101,9 +106,9 @@ function Register() {
               placeholder="(Ex. John123...)"
             />
             <ErrorMessage name="sin" render={msg => <span class="text-danger">{msg}</span>} />
-            </div>
+            </Col>
             
-            <div className='mb-3'>
+            <Col>
             <label className='form-label'>Email: </label>
             <Field
               className="inputNewEntry form-control"
@@ -112,19 +117,31 @@ function Register() {
               placeholder="(Ex. John123...)"
             />
             <ErrorMessage name="email" render={msg => <span class="text-danger">{msg}</span>} />
-            </div>
-            
-            <div className='mb-3'>
+            </Col>
+            </Row>
+            <Row className='mb-3'>
+              
+            <Col>
             <label className='form-label'>Password: </label>
             <Field
               type="password"
               className="inputNewEntry form-control"
               name="password"
-              placeholder="Your Password..."
+              placeholder="Choose a password..."
             />
             <ErrorMessage name="password" render={msg => <span class="text-danger">{msg}</span>} />
-            </div>
-
+            </Col>
+            <Col>
+            <label className='form-label'>Confirm Password</label>
+            <Field
+              type="password"
+              className="inputNewEntry form-control"
+              name="confirmPassword"
+              placeholder="Type your password again"
+            />
+            <ErrorMessage name="confirmPassword" render={msg => <span class="text-danger">{msg}</span>} />
+            </Col>
+            </Row>
             <button type="submit" className='btn btn-primary'> Register</button>
           </Form>
         </Formik>
