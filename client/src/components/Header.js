@@ -25,7 +25,7 @@ function LoggedOut(){
 
 function Client(){
     return (
-        <Nav.Link href="/client/account">Accounts</Nav.Link>
+        <Nav.Link href="/client/accounts">Accounts</Nav.Link>
     )
 }
 
