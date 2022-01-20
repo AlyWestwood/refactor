@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const { Users } = require("../models");
 const { Accounts } = require("../models");
-const { validateToken } = require("../misc/authware");
+const { validateToken, validateAdminToken } = require("../misc/authware");
+const { exchangeCurrency } = require("../utils/utils");
 
 /**
  * Returns the logged in user's accounts
@@ -16,6 +17,77 @@ router.get("/getAccounts", validateToken, async (req, res) => {
   res.json({ listOfAccounts: listOfAccounts });
 });
 
+/**
+ * returns the totals of all accounts in different currencies and the cad equivalent 
+ * 
+ */
+router.get("/totals", validateToken, async (req, res) => {
+  const userId = req.userId;
+  const listOfAccounts = await Accounts.findAll({
+    where: { userId: userId },
+  });
+
+  if (!listOfAccounts) {
+    return res.json("No accounts");
+  }
+
+  let totals = [];
+  let totalConverted = 0;
+  let totalUSD = 0;
+  let totalCAD = 0;
+  let totalEUR = 0;
+  let totalGBP = 0;
+
+  for (let i = 0; i < listOfAccounts.length; i++) {
+    let account = {};
+    account.accountId = listOfAccounts[i].id;
+    account.availableBalance = listOfAccounts[i].balance;
+    account.currency = listOfAccounts[i].currency;
+    account.accountType = listOfAccounts[i].accountType;
+
+    if (listOfAccounts[i].accountType === "credit") {
+      account.availableBalance =
+        listOfAccounts[i].creditLimit - Number(listOfAccounts[i].balance);
+      totalCAD += account.availableBalance;
+    } else {
+      switch (listOfAccounts[i].currency) {
+        case "USD":
+          totalUSD += Number(listOfAccounts[i].balance);
+          break;
+        case "EUR":
+          totalEUR += Number(listOfAccounts[i].balance);
+          break;
+        case "GBP":
+          totalGBP += Number(listOfAccounts[i].balance);
+          break;
+          case "CAD":
+          totalCAD += Number(listOfAccounts[i].balance);
+      }
+    }
+
+    if (listOfAccounts[i].currency !== "CAD") {
+      await exchangeCurrency(
+        listOfAccounts[i].currency,
+        "CAD",
+        listOfAccounts[i].balance
+      ).then((response) => {
+        account.equivalentBalance = response;
+        totalConverted += response;
+      });
+    }
+    totals.push(account);
+  }
+
+  const values = { totalUSD, totalCAD, totalEUR, totalGBP };
+  totalConverted += totalCAD;
+  console.log("at end");
+
+  return res.json({
+    accountTotals: totals,
+    totalBalanceInCad: totalConverted,
+    totalForeign: values,
+  });
+});
 /**
  * params: logged in user, account id in url
  * returns: account requested
