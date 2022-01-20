@@ -2,11 +2,18 @@ const express = require("express");
 const router = express.Router();
 const { Users } = require("../models");
 const { Transactions, Accounts, Cheques } = require("../models");
-const { validateToken, validateTokenDirect, validateAdminTokenDirect } = require("../misc/authware");
+const {
+  validateToken,
+  validateTokenDirect,
+  validateAdminTokenDirect,
+} = require("../misc/authware");
 
-const {uploadCheque, exchangeCurrency, downloadCheque} = require("../utils/utils");
-const Op = require('Sequelize').Op
-
+const {
+  uploadCheque,
+  exchangeCurrency,
+  downloadCheque,
+} = require("../utils/utils");
+const Op = require("Sequelize").Op;
 
 /**
  * gets transactions of specific account after verifying account can be accessed by logged in user
@@ -21,7 +28,9 @@ router.get("/byAccount/:accountId", validateToken, async (req, res) => {
     return res.status(404).json({ error: "No account found" });
   }
   const listOfTransactions = await Transactions.findAll({
-    where:  {  [Op.or]: [{payeeAccount: accountId}, {payerAccount: accountId}] },
+    where: {
+      [Op.or]: [{ payeeAccount: accountId }, { payerAccount: accountId }],
+    },
   });
 
   res.json(listOfTransactions);
@@ -61,7 +70,7 @@ router.post("/transferFunds", validateToken, async (req, res) => {
     return res.status(400).json("Cannot transfer funds to same account");
   }
   const originAccount = await Accounts.findOne({
-    where: { id: payerAccountId, UserId: userId },
+    where: { id: payerAccountId, userId: userId },
   });
   const targetAccount = await Accounts.findByPk(payeeAccountId);
 
@@ -166,39 +175,51 @@ router.get("/cheques/:chequeId/:accessToken", async (req, res) => {
   const validate = await validateTokenDirect(accessToken).catch((err) => {
     console.log(err);
   });
-  if(!validate){
+  if (!validate) {
     return res.status(403).json("user not auth");
   }
   const userId = validate.userId;
 
   const chequeId = req.params.chequeId;
   const cheque = await Cheques.findByPk(chequeId);
-  if(!cheque || (cheque.uploadedBy !== userId && cheque.payerAccount!== userId)){
-    return res.status(403).json({error: "User not authorized", cheque: cheque,  validate: validate});
+  if (
+    !cheque ||
+    (cheque.uploadedBy !== userId && cheque.payerAccount !== userId)
+  ) {
+    return res
+      .status(403)
+      .json({
+        error: "User not authorized",
+        cheque: cheque,
+        validate: validate,
+      });
   }
 
-//   downloadFromS3(chequeId)
-// .then((data) => {
-//   // downloadFromS3(cheque.s3key).then((data) => {
+  //   downloadFromS3(chequeId)
+  // .then((data) => {
+  //   // downloadFromS3(cheque.s3key).then((data) => {
 
-//   // res.send(Buffer.from(data.Body).toString('base64'));
-//   res.header("Content-Type", "image/jpeg").send(data.Body);
-// })
-// .catch((error) => {
-//   console.log(error);
-// });
+  //   // res.send(Buffer.from(data.Body).toString('base64'));
+  //   res.header("Content-Type", "image/jpeg").send(data.Body);
+  // })
+  // .catch((error) => {
+  //   console.log(error);
+  // });
 
-downloadCheque(chequeId).then((result) => {
-  res.header("Content-Type", "image/jpeg").send(result.Body);
-}).catch((err) => {
-  console.log("after download cheque");
-  console.log("err" + err)
-  res.status(400).json(err);
-})
+  downloadCheque(chequeId)
+    .then((result) => {
+      res.header("Content-Type", "image/jpeg").send(result.Body);
+    })
+    .catch((err) => {
+      console.log("after download cheque");
+      console.log("err" + err);
+      res.status(400).json(err);
+    });
 });
 
 router.post("/depositCheque", validateToken, async (req, res) => {
   const uploadResult = await uploadCheque(req);
+  const userId = req.userId;
   console.log(uploadResult);
   if (!uploadResult) {
     return res.status(400).json({ error: "could not record cheque" });
@@ -207,10 +228,10 @@ router.post("/depositCheque", validateToken, async (req, res) => {
   //   payeeAccountId: 3,
   //   payerAccountId: 2,
   //   value: 10,
-  //   chequeNumber: 234,
+  //   chequeNumber: 265,
   // };
   // const { payeeAccountId, payerAccountId, value, chequeNumber } = tempData;
-  // const { payeeAccountId, payerAccountId, value} = req.body;
+  const { payeeAccountId, payerAccountId, value} = req.body;
   const targetAccount = await Accounts.findOne({
     where: { id: payeeAccountId, userId: userId },
   });
@@ -261,8 +282,8 @@ router.post("/depositCheque", validateToken, async (req, res) => {
     targetCurrency: targetAccount.currency,
     transactionDate: new Date(),
     status: "pending",
-    payeeAccountId: payeeAccountId,
-    payerAccountId: payerAccountId,
+    payeeAccount: payeeAccountId,
+    payerAccount: payerAccountId,
     chequeId: chequeId,
   };
 
@@ -276,7 +297,6 @@ router.post("/depositCheque", validateToken, async (req, res) => {
       return res.status(400).json(error);
     });
 });
-
 
 /**
  * request payment

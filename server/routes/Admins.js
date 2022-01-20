@@ -1,9 +1,14 @@
-
+const { response } = require("express");
 const express = require("express");
-const { validateAdminToken, validateAdminTokenDirect } = require("../misc/authware");
+const {
+  validateAdminToken,
+  validateAdminTokenDirect,
+} = require("../misc/authware");
 const router = express.Router();
-const { Users, Accounts, Cheques } = require("../models");
-const {downloadCheque} = require("../utils/utils");
+const { Users, Accounts, Cheques, Transactions } = require("../models");
+const { downloadCheque } = require("../utils/utils");
+const db = require("../models/index");
+const { Account } = require("aws-sdk");
 
 /**
  * returns the inactive users in an array of objects
@@ -31,7 +36,7 @@ router.post("/disableUser", validateAdminToken, async (req, res) => {
     .catch((error) => {
       return res.status(400).json(error);
     });
-     
+
   for (let i = 0; i < data.length; i++) {
     if (data[i].balance != 0) {
       console.log(data.balance);
@@ -41,7 +46,10 @@ router.post("/disableUser", validateAdminToken, async (req, res) => {
 
   Users.update({ activeStatus: "disabled" }, { where: { id: userId } })
     .then((response) => {
-      Accounts.update({activeStatus: "disabled"}, {where: {UserId: userId}});
+      Accounts.update(
+        { activeStatus: "disabled" },
+        { where: { UserId: userId } }
+      );
       return res.json({ message: "User " + userId + " disabled" });
     })
     .catch((error) => {
@@ -51,17 +59,20 @@ router.post("/disableUser", validateAdminToken, async (req, res) => {
 
 router.put("/enableUser", validateAdminToken, (req, res) => {
   const { userId } = req.body;
-  Users.update({activeStatus: "active"}, {where: {id: userId}}).then((result) =>{
-    if(result == true){
-      return res.json({message: "updated user " + userId + " to active status"});
-    }else{
-      return res.status(404).json("Could not find user");
-    }
-  }).catch((err) => {
-    return res.status(400).json(err);
-  })
-})
-
+  Users.update({ activeStatus: "active" }, { where: { id: userId } })
+    .then((result) => {
+      if (result == true) {
+        return res.json({
+          message: "updated user " + userId + " to active status",
+        });
+      } else {
+        return res.status(404).json("Could not find user");
+      }
+    })
+    .catch((err) => {
+      return res.status(400).json(err);
+    });
+});
 
 /** this method needs an array of user ids ie [1,2,3]
  * it will set each user status to active
@@ -108,18 +119,20 @@ router.get("/chequeImage/:chequeId/:token", async (req, res) => {
   const validate = await validateAdminTokenDirect(token).catch((err) => {
     console.log(err);
   });
-  if(!validate){
+  if (!validate) {
     return res.status(403).json("User not authenticated");
   }
 
-  downloadCheque(chequeId).then((result) => {
-    res.header("Content-Type", "image/jpeg").send(result.Body);
-  }).catch((err) => {
-    console.log("after download cheque");
-    console.log("err" + err)
-    res.status(400).json(err);
-  })
-})
+  downloadCheque(chequeId)
+    .then((result) => {
+      res.header("Content-Type", "image/jpeg").send(result.Body);
+    })
+    .catch((err) => {
+      console.log("after download cheque");
+      console.log("err" + err);
+      res.status(400).json(err);
+    });
+});
 
 router.get("/approveCheque/:chequeId", validateAdminToken, async (req, res) => {
   const chequeId = req.params.chequeId;
@@ -127,12 +140,46 @@ router.get("/approveCheque/:chequeId", validateAdminToken, async (req, res) => {
     console.log(error);
   });
 
-  if(!cheque){
+  if (!cheque) {
     return res.status(404).json("Could not find cheque");
   }
 
   return res.json(cheque);
-})
+});
+
+router.put("/approveCheque/", validateAdminToken, async (req, res) => {
+  const { status, chequeId } = req.body;
+  const result = await db.sequelize
+  .query(
+    "select payerAccount.id as payerAccountId, transactions.payeeAccount as payeeAccountId, transactions.id as transactionId, payerAccount.balance as payerBalance, payeeAccount.accountType as payeeAccountType, payeeAccount.balance as payeeBalance, originValue, targetValue from transactions join accounts as payerAccount on payerAccount.id = transactions.payerAccount join accounts as payeeAccount on payeeAccount.id = transactions.payeeAccount where chequeId = ?", {replacements: [chequeId]}
+  );
+  if(!result){
+    return res.status(404).json("No transaction found");
+  }
+  const {payerAccountId, payeeAccountId, transactionId, payerBalance, payeeAccountType, payeeBalance, originValue, targetValue} = result[0][0];
+
+  if (status === "cleared") {
+      if(payerBalance - originValue > 0){
+        //proceed with transaction
+        const payerUpdate = await Accounts.update({balance: (payerBalance - originValue)}, {where: {id: payerAccountId}});
+        const payeeUpdateValues = {
+          balance:
+          payeeAccountType === "credit"
+              ? Number(payeeBalance) - targetValue
+              : Number(payeeBalance) + targetValue,
+        };
+        Accounts.update(payeeUpdateValues, {where: {id: payeeAccountId}});
+        Transactions.update({status: "accepted"}, {where: {id: transactionId}});
+        Cheques.update({status: "cleared"}, {where: {id: chequeId}});
+        return res.json("Cheque successfully cleared");
+      }
+  }
+
+Transactions.update({status: "denied"}, {where: {id: transactionId}});
+Cheques.update({status: "bounced"}, {where: {id: chequeId}});
+return res.json("Successfully rejected cheque");
+
+});
 
 router.put("/approveCreditAccounts", validateAdminToken, async (req, res) => {
   const { creditLimit, interestRate, accountId } = req.body;
