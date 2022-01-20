@@ -95,12 +95,38 @@ function Admin() {
 
 function Client() {
   const state = useContext(AuthContext);
-  return state.authState === null ? 
-    <div>Loading...</div> : state.authUser.role === null ? 
-    <div>Loading...</div> : state.authUser.role === 'client' ? 
-    state.authUser.status === 'active' ?
-      <Outlet /> : <div>Sit tight!<br/>You haven't been approved yet</div> :
-    <Navigate to='/login'/>
+  // return state.authState === null ? 
+  //   <div>Loading...</div> : state.authUser.role === null ? 
+  //   <div>Loading...</div> : state.authUser.role === 'client' ? 
+  //   state.authUser.status === 'active' ?
+  //     <Outlet /> : state.authUser.status === 'inactive' ?
+  //       <div>Sit tight!<br/>You haven't been approved yet</div> : <Navigate to='/login'/> :
+  //   <Navigate to='/login'/>
+
+  // if(state.authState === null){
+  //   return <div>Loading...</div>
+  // }
+  if(state.authState === false){
+    return <Navigate to='/login'/>
+  }
+  if(state.authState === true){    
+    if(state.authUser.role === 'admin'){
+      <Navigate to='/admin'/>
+    }
+    if(state.authUser.role === 'client'){
+      switch(state.authUser.status){
+        case 'disabled':
+          return <Navigate to='/login'/>
+        case 'inactive':
+          return <div>Sit tight!<br/>You haven't been approved yet</div>
+        case 'active':
+          return <Outlet />
+        default:
+          break;
+      }
+    }
+  }
+  return <div>Loading...</div>
 }
 
 function ClientHome(){
