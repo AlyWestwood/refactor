@@ -173,7 +173,7 @@ router.get("/cheques/:chequeId/:accessToken", async (req, res) => {
 
   const chequeId = req.params.chequeId;
   const cheque = await Cheques.findByPk(chequeId);
-  if(!cheque || (cheque.uploadedBy !== userId && cheque.payerAccountId!== userId)){
+  if(!cheque || (cheque.uploadedBy !== userId && cheque.payerAccount!== userId)){
     return res.status(403).json({error: "User not authorized", cheque: cheque,  validate: validate});
   }
 
@@ -203,16 +203,16 @@ router.post("/depositCheque", validateToken, async (req, res) => {
   if (!uploadResult) {
     return res.status(400).json({ error: "could not record cheque" });
   }
-  const tempData = {
-    payeeAccountId: 4,
-    payerAccountId: 3,
-    value: 27,
-    chequeNumber: 234,
-  };
-  const { payeeAccountId, payerAccountId, value, chequeNumber } = tempData;
+  // const tempData = {
+  //   payeeAccountId: 3,
+  //   payerAccountId: 2,
+  //   value: 10,
+  //   chequeNumber: 234,
+  // };
+  // const { payeeAccountId, payerAccountId, value, chequeNumber } = tempData;
   // const { payeeAccountId, payerAccountId, value} = req.body;
   const targetAccount = await Accounts.findOne({
-    where: { id: payeeAccountId, UserId: req.userId },
+    where: { id: payeeAccountId, userId: userId },
   });
   const originAccount = await Accounts.findByPk(payerAccountId);
 
@@ -225,7 +225,7 @@ router.post("/depositCheque", validateToken, async (req, res) => {
     return res.status(403).json("Unable to transfer to that account");
   }
   const duplicateCheques = await Cheques.findAll({
-    where: { payerAccountId: payerAccountId, chequeNumber: chequeNumber },
+    where: { payerAccount: payerAccountId, chequeNumber: chequeNumber },
   });
   if (duplicateCheques) {
     for (let i = 0; i < duplicateCheques.length; i++) {
@@ -239,8 +239,9 @@ router.post("/depositCheque", validateToken, async (req, res) => {
     s3key: uploadResult.key,
     uploadDate: new Date(),
     status: "on hold",
-    uploadedBy: req.userId,
-    payerAccountId: payerAccountId,
+    payeeAccount: payeeAccountId,
+    payerAccount: payerAccountId,
+    chequeNumber: chequeNumber,
   };
   let chequeId;
   const cheque = await Cheques.create(chequeData).then(
