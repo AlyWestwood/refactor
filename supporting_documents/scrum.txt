@@ -121,3 +121,27 @@ Aly
 - get information on the accounts page
 3. Where do I need assistance? What do I need to figure out?
 - how to get all the information to the front end from accounts table joined with transactions into one react component
+
+20 Jan 2022
+Kate
+1. What I have done / not done since last Scrum?
+- automatic emails working!
+- fixed up associations
+- started working on admin approval for cheques
+2. What I plan to do from this scrum to next? (next 24 hours)
+- admin approval for cheques
+3. Where do I need assistance? What do I need to figure out?
+- not at this time
+
+Aly
+1. What I have done / not done since last Scrum?
+- redid authcontext to include more user information
+- restricted access to inactive users
+- account cards reading card information
+    - transaction information being read but need refinement
+- refined login and registration forms
+2. What I plan to do from this scrum to next? (next 24 hours)
+- get transaction information displayed intuitively 
+- transfer page?
+3. Where do I need assistance? What do I need to figure out?
+- react~
