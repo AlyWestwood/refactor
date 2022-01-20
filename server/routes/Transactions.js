@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Users } = require("../models");
+const db = require("../models/index");
 const {
   Transactions,
   Accounts,
@@ -80,7 +80,7 @@ router.post("/recurringPayments", validateToken, async (req, res) => {
   if (
     !payerAccount ||
     !payeeAccount ||
-    payerAccount.userId === payeeAccount.userId
+    payerAccount.userId === payeeAccount.userId || payerAccountId === payeeAccountId
   ) {
     return res
       .status(400)
@@ -119,6 +119,46 @@ router.post("/recurringPayments", validateToken, async (req, res) => {
       return res.status(400).json(err);
     });
 });
+
+/**
+ * cancel recurring payment - sets to disabled in db
+ * params - logged in user, recurring payment id
+ */
+router.put("/cancelRecurringPayment", validateToken, (req, res) => {
+  const { recurringPaymentId } = req.body;
+  const userId = req.userId;
+
+  db.sequelize
+  .query(
+    "select accounts.userId as userId from recurringPayments join accounts on accounts.id = recurringPayments.payerAccount where recurringPayments.id = ?", {replacements: [recurringPaymentId]},
+  ).then((response) => {
+    if(response[0].length > 0){
+      //result
+      RecurringPayments.update({activeStatus: "inactive"}, {where: {id: recurringPaymentId}});
+      return res.json("Disabled recurring payment");
+    }else{
+      //no result
+      res.status(400).json("Cannot cancel this recurring payment");
+    }
+  });
+});
+
+/** 
+ * return active recurring payments by account - not user
+ */
+router.get("/recurringPayments/:accountNumber", validateToken, async (req, res) => {
+  const userId = req.userId;
+  const {accountNumber} = req.params;
+
+  const recurringPayments = await RecurringPayments.findAll({where: {payerAccount: accountNumber}});
+  if(recurringPayments.length > 0){
+    const account = await Accounts.findByPk(recurringPayments[0].payerAccount);
+    if(account.userId === userId){
+      return res.json(recurringPayments);
+    }
+  }
+  return res.json("No recurring payments on this accounts")
+})
 
 
 /**
