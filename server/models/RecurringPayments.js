@@ -14,6 +14,15 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      originValue: {
+        type: DataTypes.DECIMAL(10,2),
+        allowNull: false,
+      },
+      activeStatus: {
+        type: DataTypes.ENUM("active", "inactive"),
+        defaultValue: "inactive",
+        allowNull: false,
+      },
       payerAccount: {
         type: DataTypes.INTEGER,
         references: {

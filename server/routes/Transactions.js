@@ -1,7 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const { Users } = require("../models");
-const { Transactions, Accounts, Cheques } = require("../models");
+const {
+  Transactions,
+  Accounts,
+  Cheques,
+  RecurringPayments,
+} = require("../models");
 const {
   validateToken,
   validateTokenDirect,
@@ -56,6 +61,65 @@ router.get(
     return res.json(transaction);
   }
 );
+
+/**
+ * set up a recurring payment
+ * interval in days
+ */
+
+router.post("/recurringPayments", validateToken, async (req, res) => {
+  const userId = req.userId;
+  const { payerAccountId, payeeAccountId, originValue, interval, startDate } =
+    req.body;
+
+  const payerAccount = await Accounts.findOne({
+    where: { id: payerAccountId, userId: userId },
+  });
+  const payeeAccount = await Accounts.findByPk(payeeAccountId);
+
+  if (
+    !payerAccount ||
+    !payeeAccount ||
+    payerAccount.userId === payeeAccount.userId
+  ) {
+    return res
+      .status(400)
+      .json("Cannot create a recurring payment with these accounts");
+  }
+
+  const startDateObj = new Date(startDate);
+
+  if (startDateObj <= new Date()) {
+    return res.status(400).json("Start date must be after today");
+  }
+
+  if (originValue < 1) {
+    return res.status(400).json("The payment value must be more than 1");
+  }
+
+  if (interval < 1) {
+    return res
+      .status(400)
+      .json("The recurring interval must be at least 1 day");
+  }
+
+  const recurringPayment = {
+    payerAccount: payerAccountId,
+    payeeAccount: payeeAccountId,
+    originValue: originValue,
+    activeStatus: "active",
+    paymentDate: startDate,
+    interval: interval,
+  };
+  RecurringPayments.create(recurringPayment)
+    .then((response) => {
+      return res.json("Successfully created a recurring payment");
+    })
+    .catch((err) => {
+      return res.status(400).json(err);
+    });
+});
+
 
 /**
  * post here when a user creates a transaction - requesting payment, transferring funds, paying fees
@@ -186,13 +250,11 @@ router.get("/cheques/:chequeId/:accessToken", async (req, res) => {
     !cheque ||
     (cheque.uploadedBy !== userId && cheque.payerAccount !== userId)
   ) {
-    return res
-      .status(403)
-      .json({
-        error: "User not authorized",
-        cheque: cheque,
-        validate: validate,
-      });
+    return res.status(403).json({
+      error: "User not authorized",
+      cheque: cheque,
+      validate: validate,
+    });
   }
 
   //   downloadFromS3(chequeId)
@@ -231,7 +293,7 @@ router.post("/depositCheque", validateToken, async (req, res) => {
   //   chequeNumber: 265,
   // };
   // const { payeeAccountId, payerAccountId, value, chequeNumber } = tempData;
-  const { payeeAccountId, payerAccountId, value} = req.body;
+  const { payeeAccountId, payerAccountId, value } = req.body;
   const targetAccount = await Accounts.findOne({
     where: { id: payeeAccountId, userId: userId },
   });
