@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      payerAccountId: {
+      payerAccount: {
         type: DataTypes.INTEGER,
         references: {
           model: 'Accounts',
@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         allowNull: false,
       },
-      payeeAccountId: {
+      payeeAccount: {
         type: DataTypes.INTEGER,
         references: {
           model: 'Accounts',
