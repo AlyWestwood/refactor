@@ -134,6 +134,13 @@ router.get("/chequeImage/:chequeId/:token", async (req, res) => {
     });
 });
 
+/**
+ * data required: 
+ * {
+    "status": "cleared",
+    "chequeId": 2
+}
+ */
 router.get("/approveCheque/:chequeId", validateAdminToken, async (req, res) => {
   const chequeId = req.params.chequeId;
   const cheque = await Cheques.findByPk(chequeId).catch((error) => {
@@ -153,7 +160,7 @@ router.put("/approveCheque/", validateAdminToken, async (req, res) => {
   .query(
     "select payerAccount.id as payerAccountId, transactions.payeeAccount as payeeAccountId, transactions.id as transactionId, payerAccount.balance as payerBalance, payeeAccount.accountType as payeeAccountType, payeeAccount.balance as payeeBalance, originValue, targetValue from transactions join accounts as payerAccount on payerAccount.id = transactions.payerAccount join accounts as payeeAccount on payeeAccount.id = transactions.payeeAccount where chequeId = ?", {replacements: [chequeId]}
   );
-  if(!result){
+  if(!result[0][0]){
     return res.status(404).json("No transaction found");
   }
   const {payerAccountId, payeeAccountId, transactionId, payerBalance, payeeAccountType, payeeBalance, originValue, targetValue} = result[0][0];
