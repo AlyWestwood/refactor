@@ -203,14 +203,14 @@ router.post("/depositCheque", validateToken, async (req, res) => {
   if (!uploadResult) {
     return res.status(400).json({ error: "could not record cheque" });
   }
-  const tempData = {
-    payeeAccountId: 4,
-    payerAccountId: 3,
-    value: 27,
-    chequeNumber: 234,
-  };
-  const { payeeAccountId, payerAccountId, value, chequeNumber } = tempData;
-  // const { payeeAccountId, payerAccountId, value} = req.body;
+  // const tempData = {
+  //   payeeAccountId: 4,
+  //   payerAccountId: 3,
+  //   value: 27,
+  //   chequeNumber: 234,
+  // };
+  // const { payeeAccountId, payerAccountId, value, chequeNumber } = tempData;
+  const { payeeAccountId, payerAccountId, value} = req.body;
   const targetAccount = await Accounts.findOne({
     where: { id: payeeAccountId, UserId: req.userId },
   });
