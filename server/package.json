@@ -11,6 +11,8 @@
   "author": "Aly Westwood & Kate Post",
   "license": "ISC",
   "dependencies": {
+    "@sendgrid/client": "^7.6.0",
+    "@sendgrid/mail": "^7.6.0",
     "aws-sdk": "^2.1058.0",
     "axios": "^0.24.0",
     "bcrypt": "^5.0.1",

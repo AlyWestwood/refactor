@@ -5,6 +5,7 @@ const { Transactions, Accounts, Cheques } = require("../models");
 const { validateToken, validateTokenDirect, validateAdminTokenDirect } = require("../misc/authware");
 
 const {uploadCheque, exchangeCurrency, downloadCheque} = require("../utils/utils");
+const Op = require('Sequelize').Op
 
 
 /**
@@ -15,12 +16,12 @@ const {uploadCheque, exchangeCurrency, downloadCheque} = require("../utils/utils
  */
 router.get("/byAccount/:accountId", validateToken, async (req, res) => {
   const accountId = req.params.accountId;
-  const account = await Accounts.findOne({ where: { UserId: req.userId } });
+  const account = await Accounts.findOne({ where: { userId: req.userId } });
   if (!account) {
     return res.status(404).json({ error: "No account found" });
   }
   const listOfTransactions = await Transactions.findAll({
-    where: { payeeAccountId: accountId, payerAccountId: accountId },
+    where:  {  [Op.or]: [{payeeAccount: accountId}, {payerAccount: accountId}] },
   });
 
   res.json(listOfTransactions);

@@ -10,7 +10,7 @@ const { validateToken } = require("../misc/authware");
 router.get("/getAccounts", validateToken, async (req, res) => {
   const userId = req.userId;
   const listOfAccounts = await Accounts.findAll({
-    where: { UserId: userId },
+    where: { userId: userId },
   });
 
   res.json({ listOfAccounts: listOfAccounts });
@@ -25,7 +25,7 @@ router.get("/getAccounts", validateToken, async (req, res) => {
 router.get("/singleAccount/:id", validateToken, async (req, res) => {
   const accountId = req.params.id;
   const account = await Accounts.findOne({
-    where: { UserId: req.userId, id: accountId },
+    where: { userId: req.userId, id: accountId },
   });
 
   if (!account) {
@@ -52,7 +52,7 @@ router.post("/createAccount", validateToken, async (req, res) => {
   const account = {
     accountType: accountType,
     currency: currency,
-    UserId: userId,
+    userId: userId,
   };
 
   if (accountType === "debit") {
@@ -81,7 +81,7 @@ router.post("/closeAccount", validateToken, async (req, res) => {
   const userId = req.userId;
   const { accountId } = req.body;
   const account = await Accounts.findOne({
-    where: { UserId: userId, id: accountId },
+    where: { userId: userId, id: accountId },
   });
 
   if (!account) {

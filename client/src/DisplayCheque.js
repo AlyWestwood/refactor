@@ -18,6 +18,7 @@ function DisplayCheque() {
 
   return (
     <div>
+      <img src={`http://localhost:3001/admin/chequeImage/${chequeId}/${token}`}></img>
       <img src={`http://localhost:3001/transactions/cheques/${chequeId}/${token}`}></img>
     </div>
   );

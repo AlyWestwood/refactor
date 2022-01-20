@@ -63,14 +63,13 @@ const validateAdminTokenDirect = async (accessToken) => {
                 userId: validateToken.id,
               });
             } else {
-              reject({ error: "User not auntheticated" });
+              reject({ error: "User is not admin" });
             }
           })
           .catch((err) => {
             reject({ error: "User not auntheticated" });
           });
-      }
-      reject({ error: "User not auntheticated" });
+      }      
     } catch (err) {
       console.log(err);
       reject({ error: "User not auntheticated" });

@@ -1,9 +1,9 @@
-const { response } = require("express");
+
 const express = require("express");
 const { validateAdminToken, validateAdminTokenDirect } = require("../misc/authware");
 const router = express.Router();
-const { Users } = require("../models");
-const { Accounts } = require("../models");
+const { Users, Accounts, Cheques } = require("../models");
+const {downloadCheque} = require("../utils/utils");
 
 /**
  * returns the inactive users in an array of objects
@@ -98,23 +98,40 @@ router.get("/approveCreditAccounts", validateAdminToken, async (req, res) => {
   res.json({ listOfInactiveCreditAccounts: listOfInactiveCreditAccounts });
 });
 
-router.get("/approveCheque/:id/:token", async (req, res) => {
-  
-})
-
 /**
  * admin get cheque image - accessToken must be in the url
+ * use with /approvecheque - 1 to display check img, 1 to display cheque info and transaction info
  */
 router.get("/chequeImage/:chequeId/:token", async (req, res) => {
   const token = req.params.token;
-  const validate = await validateAdminTokenDirect(token);
-
+  const chequeId = req.params.chequeId;
+  const validate = await validateAdminTokenDirect(token).catch((err) => {
+    console.log(err);
+  });
   if(!validate){
     return res.status(403).json("User not authenticated");
   }
 
-  
+  downloadCheque(chequeId).then((result) => {
+    res.header("Content-Type", "image/jpeg").send(result.Body);
+  }).catch((err) => {
+    console.log("after download cheque");
+    console.log("err" + err)
+    res.status(400).json(err);
+  })
+})
 
+router.get("/approveCheque/:chequeId", validateAdminToken, async (req, res) => {
+  const chequeId = req.params.chequeId;
+  const cheque = await Cheques.findByPk(chequeId).catch((error) => {
+    console.log(error);
+  });
+
+  if(!cheque){
+    return res.status(404).json("Could not find cheque");
+  }
+
+  return res.json(cheque);
 })
 
 router.put("/approveCreditAccounts", validateAdminToken, async (req, res) => {
