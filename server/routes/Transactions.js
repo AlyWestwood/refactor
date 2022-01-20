@@ -68,8 +68,6 @@ router.post("/transferFunds", validateToken, async (req, res) => {
   if (
     !originAccount ||
     !targetAccount ||
-    payerAccountId === 1 ||
-    payeeAccountId === 1 ||
     originAccount.activeStatus !== "active" ||
     targetAccount.activeStatus !== "active"
   ) {
