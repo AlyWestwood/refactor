@@ -4,13 +4,13 @@
 
 import React, {useEffect, useState} from 'react';
 import {Link, useContext } from 'react-router-dom';
-import { Card, Col, ListGroup } from 'react-bootstrap'
+import { Card, Col, Row, ListGroup } from 'react-bootstrap'
 import axios from 'axios';
 import { reqHeader } from '../../misc/reqHeader';
 
 function DisplayAccount({value}){
     const [transactionList, setTransactionList] = useState([]);
-
+    
     useEffect(() => {
         axios.get(`/transactions/byAccount/${value.id}`, reqHeader)
         .then(res => {
@@ -19,33 +19,62 @@ function DisplayAccount({value}){
             // console.log(transactionList)
         })
     }, [value]);
-
+    
     console.log(transactionList);
     return (
         <>
         <Card className='m-3' key={value.id}>
-            <Card.Header>{value.id} - {value.accountType}</Card.Header>
+            <Card.Header className='text-start h5'><Row><Col className=''>{value.accountType === 'debit' ? 'Debit' : 'Credit'}</Col><Col className='text-end'>Account #: {value.id}</Col></Row></Card.Header>
             <Card.Body>
-                <Card.Title>Balance: {value.balance}</Card.Title>
+                <Card.Title className='text-end'>Balance: ${value.balance}</Card.Title>
                 {transactionList.length === 0 && <div>No transactions</div>}
             </Card.Body>
             <ListGroup>
                 {transactionList.map(transaction => {
                     return (
-                    <ListGroup.Item key={transaction.id}>{transaction.originValue} - </ListGroup.Item>
-                )})}
+                        <ListGroup.Item key={transaction.id}>{assignTransaction(transaction, value.id)}</ListGroup.Item>
+                        )})}
             </ListGroup>
         </Card>
         </>
     )
 }
 
+function parseDate(date){
+    const formatDate = new Intl.DateTimeFormat('en-GB', {day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true});
+    let dateObject = new Date(Date.parse(date));
+    return formatDate.format(dateObject);
+
+}
+
+function assignTransaction(transaction, accountId){
+    if(transaction.payerAccount === accountId){
+        //do stuff
+        //outgoing transaction
+        //minus
+        return <><Row><Col className='text-start'>{parseDate(transaction.createdAt)} : paid to #{transaction.payeeAccount}</Col><Col sm={3} className='text-end'>-${transaction.originValue} {transaction.originCurrency}</Col></Row></>;
+    } else if (transaction.payeeAccount === accountId){
+        return <><Row><Col className='text-start'>{parseDate(transaction.createdAt)} : received from #{transaction.payerAccount}</Col><Col sm={3} className='text-end'>${transaction.targetValue} {transaction.targetCurrency}</Col></Row></>;
+    } else {
+        return "error";
+    }
+}
+
 function Account() {
     const [accountList, setAccountList] = useState([]);
+    const [totalDebit, setTotalDebit] = useState();
+    const [totalCredit, setTotalCredit] = useState(0);
 
     useEffect(() => {
         axios.get('/accounts/getAccounts', reqHeader).then(res => {
             setAccountList(res.data.listOfAccounts);
+            let debit = 0;
+            for(var account in res.data.listOfAccounts){
+                if(account.accountType === 'debit'){
+                    debit += account.balance
+                }
+            }
+            setTotalDebit(debit);
         })
     }, [])
 
@@ -62,41 +91,9 @@ function Account() {
                 )
             })}
   
-        {/* <Card className='m-3'>
-                <Card.Header>account number</Card.Header>
-                <ListGroup>
-                    <ListGroup.Item>money</ListGroup.Item>
-                    <ListGroup.Item>money</ListGroup.Item>
-                    <ListGroup.Item>money</ListGroup.Item>
-                </ListGroup>
-            </Card>
-            <Card className='m-3'>
-                <Card.Header>account number</Card.Header>
-                <ListGroup>
-                    <ListGroup.Item>money</ListGroup.Item>
-                    <ListGroup.Item>money</ListGroup.Item>
-                    <ListGroup.Item>money</ListGroup.Item>
-                </ListGroup>
-            </Card>
-            <Card className='m-3'>
-                <Card.Header>account number</Card.Header>
-                <ListGroup>
-                    <ListGroup.Item>money</ListGroup.Item>
-                    <ListGroup.Item>money</ListGroup.Item>
-                    <ListGroup.Item>money</ListGroup.Item>
-                </ListGroup>
-            </Card>
-            <Card className='m-3'>
-                <Card.Header>account number</Card.Header>
-                <ListGroup>
-                    <ListGroup.Item>money</ListGroup.Item>
-                    <ListGroup.Item>money</ListGroup.Item>
-                    <ListGroup.Item>money</ListGroup.Item>
-                </ListGroup>
-            </Card> */}
         </Col>
         <Col>
-            <Card className='m-3 sticky-top'>
+            <Card className='m-3 sticky-top text-end'>
                 <Card.Header>
                     words
                 </Card.Header>
@@ -107,8 +104,7 @@ function Account() {
                     </Card.Text>
                 </Card.Body>
                 <ListGroup>
-                    <ListGroup.Item>Total saving</ListGroup.Item>
-                    <ListGroup.Item>Total spending</ListGroup.Item>
+                    <ListGroup.Item>Total debit: ${totalDebit}</ListGroup.Item>
                     <ListGroup.Item>Total credit</ListGroup.Item>
                 </ListGroup>
             </Card>

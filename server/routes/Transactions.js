@@ -87,8 +87,8 @@ router.post("/transferFunds", validateToken, async (req, res) => {
     targetCurrency: targetAccount.currency,
     transactionDate: new Date(),
     status: "pending",
-    payeeAccountId: payeeAccountId,
-    payerAccountId: payerAccountId,
+    payeeAccount: payeeAccountId,
+    payerAccount: payerAccountId,
   };
 
   let transactionResult;
