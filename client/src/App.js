@@ -69,7 +69,7 @@ function App() {
                 <Route path="chequedeposit" element={<Deposit/>}>
                   <Route path=":accountId" element={<Deposit/>}/>
                 </Route>
-                <Route path="/recurringpayment" element={<RecurringPayment/>}/>
+                <Route path="recurringpayment" element={<RecurringPayment/>}/>
                 <Route path="paybills" element={<PayBills/>}/>
                 {/* <Route path="transactions" element={<Transactions/>}/> */}
                 <Route path="transfer" element={<TransferC/>}/>
