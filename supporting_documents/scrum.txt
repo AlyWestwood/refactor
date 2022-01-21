@@ -145,3 +145,25 @@ Aly
 - transfer page?
 3. Where do I need assistance? What do I need to figure out?
 - react~
+
+21 Jan 2022
+Kate
+1. What I have done / not done since last Scrum?
+-totals endpoint
+-recurring payments
+-admin approval of cheques
+2. What I plan to do from this scrum to next? (next 24 hours)
+-interest / credit stuff
+3. Where do I need assistance? What do I need to figure out?
+-interest calculations
+
+Aly
+1. What I have done / not done since last Scrum?
+- restricted access to disabled users
+- started transaction details implementation
+- foundation for cheque deposit form
+2. What I plan to do from this scrum to next? (next 24 hours)
+- hook up and test cheque deposits
+- transfers
+3. Where do I need assistance? What do I need to figure out?
+- time management
