@@ -25,7 +25,11 @@ function LoggedOut(){
 
 function Client(){
     return (
+        <>
         <Nav.Link href="/client/accounts">Accounts</Nav.Link>
+        <Nav.Link href="/client/chequedeposit">Deposit</Nav.Link>
+        <Nav.Link href="/client/transfer">Transfer funds</Nav.Link>
+        </>
     )
 }
 

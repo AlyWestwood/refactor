@@ -1,7 +1,7 @@
 /**
  * Transfer money from one account to another
  */
-import React from 'react'
+import React from 'react';
 
 function Transfer() {
     return (
