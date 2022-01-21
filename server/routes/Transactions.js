@@ -180,18 +180,30 @@ router.get(
 
 /**
  * post here when a user creates a transaction - requesting payment, transferring funds, paying fees
+ * 
+ * if a paying fees transaction -- add payingFees: true and accountWithFees: accountId to req body 
  *
  * params: logged in user, target account id, origin account id, value (in origin account currency)
  */
 
 router.post("/transferFunds", validateToken, async (req, res) => {
   const userId = req.userId;
-  const { payerAccountId, payeeAccountId, originValue } = req.body;
+  let { payerAccountId, payeeAccountId, originValue, payingFees, accountWithFees } = req.body;
   if (payerAccountId === payeeAccountId) {
     return res.status(400).json("Cannot transfer funds to same account");
   }
+
+  let accountCarryingFees;
+  //this needs to be the admin account!!!
+  if(payingFees === true){
+    payeeAccountId = 0;
+    if(payerAccountId === accountWithFees){
+      return res.status(400).json("Cannot pay fess on account with that account");
+    }
+  }
+
   const originAccount = await Accounts.findOne({
-    where: { id: payerAccountId, userId: userId },
+    where: { id: payerAccountId, userId: userId},
   });
   const targetAccount = await Accounts.findByPk(payeeAccountId);
 
@@ -202,6 +214,17 @@ router.post("/transferFunds", validateToken, async (req, res) => {
     targetAccount.activeStatus !== "active"
   ) {
     return res.status(403).json("Cannot transfer funds with this account");
+  }
+
+
+  if(payingFees === true){
+     accountCarryingFees = await Accounts.findByPk(accountWithFees);
+     if(accountCarryingFees.userId !== originAccount.userId){
+       return res.status(403).json("You cannot pay the fees on that account");
+     }
+    if(accountCarryingFees.latePaymentFees < originValue){
+      return res.status(400).json("Cannot over pay late fees.");
+    }
   }
 
   const targetValue = await exchangeCurrency(
@@ -258,12 +281,21 @@ router.post("/transferFunds", validateToken, async (req, res) => {
         : Number(originAccount.balance) - transactionResult.originValue,
   };
 
-  const payeeUpdate = {
+  let payeeUpdate = {
     balance:
       targetAccount.accountType === "credit"
         ? Number(targetAccount.balance) - transactionResult.targetValue
         : Number(targetAccount.balance) + transactionResult.targetValue,
   };
+
+  if(targetAccount.accountType === "credit" && targetAccount.minimumPayment > 0){
+    targetAccount.minimumPayment = targetAccount.minimumPayment - targetValue;
+    if(targetAccount.minimumPayment < 0){
+      payeeUpdate.minimumPayment = 0;
+    }else{
+      payeeUpdate.minimumPayment = minimumPayment;
+    }
+  }
 
   Accounts.update(payerUpdate, { where: { id: payerAccountId } })
     .then((result) => {
@@ -283,6 +315,15 @@ router.post("/transferFunds", validateToken, async (req, res) => {
   Transactions.update(transactionUpdate, {
     where: { id: transactionResult.id },
   });
+
+  if(payingFees === true){
+    const latePaymentFees = accountCarryingFees.latePaymentFees - targetValue;
+    console.log(latePaymentFees)
+    Accounts.update({latePaymentFees: latePaymentFees}, {where: {id: accountWithFees}}).then((result) => {
+      console.log(result);
+    });
+    return res.json("paid fees");
+  }
   return res.json("Transferred successfully");
 });
 

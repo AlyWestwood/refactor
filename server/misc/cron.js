@@ -5,6 +5,7 @@ const db = require("../models/index");
 const sgMail = require("@sendgrid/mail");
 const { exchangeCurrency } = require("../utils/utils");
 const { Op } = require("sequelize");
+const { Account } = require("aws-sdk");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 function cron() {
@@ -20,40 +21,43 @@ function cron() {
 async function checkCreditUpdates() {
   const creditFeesDueAccounts = await Accounts.findAll({
     where: {
-      nextPaymentDueDate: { [Op.lte]: new Date() },
+      nextPaymentDueDate: { [Op.eq]: new Date() },
       balance: { [Op.gt]: 0 },
       activeStatus: "active",
     },
   });
 
-  // for (let i = 0; i < creditFeesDueAccounts.length; i++) {
-  //   const account = creditFeesDueAccounts[i];
+  console.log(creditFeesDueAccounts);
 
-  //   const today = new Date().setUTCHours(0, 0, 0, 0);
-  //   const dbDate = new Date(account.nextPaymentDueDate).setUTCHours(0, 0, 0, 0);
+  for (let i = 0; i < creditFeesDueAccounts.length; i++) {
+    const account = creditFeesDueAccounts[i];
 
-  //   //if this is the first time we're seeing this account (ie, it's today), decide the minimum payment and calculate the interest on this balance for the 
-  //   let updateValues = {};
-  //   if (dbDate === today) {
-  //     const minimumPayment = account.balance * 0.10;
-  //     const accruedInterest =  Number(account.balance) * (Number(account.interestRate) / 100 );
-  //     updateValues.minimumPayment = minimumPayment;
-  //     updateValues.balance = Number(account.balance) + Number(accruedInterest);
-  //   }
+    const today = new Date().setUTCHours(0, 0, 0, 0);
+    const dbDate = new Date(account.nextPaymentDueDate).setUTCHours(0, 0, 0, 0);
 
-  //   const dateModifier = new Date(dbDate);
-  //   dateModifier.setDate(dateModifier.getDate() + 5);
-  //   if(dateModifier <= new Date() && account.minimumPayment > 0){
-  //     console.log("over 5 days");
-  //     updateValues.latePaymentFees = Number(account.latePaymentFees) + 5;
-  //   }
+    //if this is the first time we're seeing this account (ie, it's today), decide the minimum payment and calculate the interest on this balance for the 
+    let updateValues = {};
+    if (dbDate === today) {
+      const minimumPayment = account.balance * 0.10;
+      const accruedInterest =  Number(account.balance) * (Number(account.interestRate) / 100 );
+      updateValues.minimumPayment = minimumPayment;
+      updateValues.balance = Number(account.balance) + Number(accruedInterest);
+      const prevPayDate = new Date(account.nextPaymentDueDate);
+      updateValues.nextPaymentDueDate = new Date(prevPayDate.setMonth(prevPayDate.getMonth()+1));
+    }
+  }
 
-  //   console.log(updateValues);
-  //   Accounts.update(updateValues, {where: {id: account.id}}).then((result) => {
-  //     console.log(result)
-    // });
-  // }
-  //add interest to balance
+  //add late payment fees daily to accounts with outstanding minimum payments
+  const minimumPaymentNotPaid = await Accounts.findAll({
+    where: {
+      minimumPayment: {[Op.gt]: 0}
+    }
+  });
+  for(let i = 0; i < minimumPaymentNotPaid.length; i++){
+    let updateValues = {};
+    updateValues.latePaymentFees = Number(minimumPaymentNotPaid[i].latePaymentFees) + 2;
+    Accounts.update(updateValues, {where: {id: minimumPaymentNotPaid[i].id}});
+  }
 }
 
 async function checkRecurringPayments() {
