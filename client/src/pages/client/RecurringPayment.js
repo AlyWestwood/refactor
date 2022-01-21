@@ -1,6 +1,6 @@
 import React from 'react'
 
-function RequestPayment() {
+function RecurringPayment() {
     return (
         <div>
             
@@ -8,4 +8,4 @@ function RequestPayment() {
     )
 }
 
-export default RequestPayment
+export default RecurringPayment
