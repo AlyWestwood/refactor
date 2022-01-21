@@ -5,7 +5,7 @@ const cors = require('cors');
 
 const db = require('./models');
 
-const {cron} = require("./misc/cron");
+const {cron, checkCreditUpdates} = require("./misc/cron");
 
 
 app.use(express.json())
@@ -26,6 +26,7 @@ app.use("/accounts", accountsRouter);
 
 db.sequelize.sync().then(() => {
     cron();
+    checkCreditUpdates();
     app.listen(process.env.PORT, () => {
     console.log("running on port " + process.env.PORT);
 });

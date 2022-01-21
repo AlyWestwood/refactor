@@ -22,6 +22,15 @@ router.get("/approveUsers", validateAdminToken, async (req, res) => {
 });
 
 /**
+ * returns all users 
+ */
+router.get("/allUsers", validateAdminToken, async (req, res) => {
+  const listOfUsers = await Users.findAll();
+
+  res.json({listOfUsers: listOfUsers});
+})
+
+/**
  * Admins can disable users - not delete
  * all that users accounts must be zeroed first
  * params - admin logged in, user id to be disabled
