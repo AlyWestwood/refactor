@@ -177,6 +177,10 @@ router.post("/closeAccount", validateToken, async (req, res) => {
     });
 });
 
+router.get("/payCreditFees", validateToken, (req, res) => {
+  
+})
+
 function validateAccountApplication(user, requestBody) {
   const { currency, accountType } = requestBody;
   if (!user) {

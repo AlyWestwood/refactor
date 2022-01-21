@@ -80,7 +80,10 @@ router.post("/recurringPayments", validateToken, async (req, res) => {
   if (
     !payerAccount ||
     !payeeAccount ||
-    payerAccount.userId === payeeAccount.userId || payerAccountId === payeeAccountId
+    payerAccount.userId === payeeAccount.userId ||
+    payerAccountId === payeeAccountId ||
+    payerAccount.activeStatus !== "active" ||
+    payeeAccount.activeStatus !== "active"
   ) {
     return res
       .status(400)
@@ -129,37 +132,49 @@ router.put("/cancelRecurringPayment", validateToken, (req, res) => {
   const userId = req.userId;
 
   db.sequelize
-  .query(
-    "select accounts.userId as userId from recurringPayments join accounts on accounts.id = recurringPayments.payerAccount where recurringPayments.id = ?", {replacements: [recurringPaymentId]},
-  ).then((response) => {
-    if(response[0].length > 0){
-      //result
-      RecurringPayments.update({activeStatus: "inactive"}, {where: {id: recurringPaymentId}});
-      return res.json("Disabled recurring payment");
-    }else{
-      //no result
-      res.status(400).json("Cannot cancel this recurring payment");
-    }
-  });
+    .query(
+      "select accounts.userId as userId from recurringPayments join accounts on accounts.id = recurringPayments.payerAccount where recurringPayments.id = ?",
+      { replacements: [recurringPaymentId] }
+    )
+    .then((response) => {
+      if (response[0].length > 0) {
+        //result
+        RecurringPayments.update(
+          { activeStatus: "inactive" },
+          { where: { id: recurringPaymentId } }
+        );
+        return res.json("Disabled recurring payment");
+      } else {
+        //no result
+        res.status(400).json("Cannot cancel this recurring payment");
+      }
+    });
 });
 
-/** 
+/**
  * return active recurring payments by account - not user
  */
-router.get("/recurringPayments/:accountNumber", validateToken, async (req, res) => {
-  const userId = req.userId;
-  const {accountNumber} = req.params;
+router.get(
+  "/recurringPayments/:accountNumber",
+  validateToken,
+  async (req, res) => {
+    const userId = req.userId;
+    const { accountNumber } = req.params;
 
-  const recurringPayments = await RecurringPayments.findAll({where: {payerAccount: accountNumber}});
-  if(recurringPayments.length > 0){
-    const account = await Accounts.findByPk(recurringPayments[0].payerAccount);
-    if(account.userId === userId){
-      return res.json(recurringPayments);
+    const recurringPayments = await RecurringPayments.findAll({
+      where: { payerAccount: accountNumber },
+    });
+    if (recurringPayments.length > 0) {
+      const account = await Accounts.findByPk(
+        recurringPayments[0].payerAccount
+      );
+      if (account.userId === userId) {
+        return res.json(recurringPayments);
+      }
     }
+    return res.json("No recurring payments on this accounts");
   }
-  return res.json("No recurring payments on this accounts")
-})
-
+);
 
 /**
  * post here when a user creates a transaction - requesting payment, transferring funds, paying fees
@@ -182,7 +197,7 @@ router.post("/transferFunds", validateToken, async (req, res) => {
     !originAccount ||
     !targetAccount ||
     originAccount.activeStatus !== "active" ||
-    targetAccount.activeStatus !== "active"
+    targetAccount.activeStatus !== "active" 
   ) {
     return res.status(403).json("Cannot transfer funds with this account");
   }
@@ -335,15 +350,15 @@ router.post("/depositCheque", validateToken, async (req, res) => {
   // const { payeeAccountId, payerAccountId, value, chequeNumber } = tempData;
   const { payeeAccountId, payerAccountId, value } = req.body;
   const targetAccount = await Accounts.findOne({
-    where: { id: payeeAccountId, userId: userId },
+    where: { id: payeeAccountId, userId: userId, activeStatus: "active" },
   });
-  const originAccount = await Accounts.findByPk(payerAccountId);
+  const originAccount = await Accounts.findOne({where: {id: payerAccountId, activeStatus: "active"}});
 
   if (
     !originAccount ||
     !targetAccount ||
     originAccount.accountType === "credit" ||
-    payeeAccountId === payerAccountId
+    payeeAccountId === payerAccountId || originAccount.userId === targetAccount.userId
   ) {
     return res.status(403).json("Unable to transfer to that account");
   }
