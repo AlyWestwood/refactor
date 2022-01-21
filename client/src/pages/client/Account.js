@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { reqHeader } from '../../misc/reqHeader';
 import DisplayAccount from '../../components/DisplayAccount';
@@ -22,7 +22,7 @@ function Account() {
             <DisplayAccount key={account.id} value={account}/>
         </Col>
         <Col>
-        <Card className='m-3 sticky-top text-end'>
+            <Card className='m-3 sticky-top text-end'>
                 <Card.Header>
                     words
                 </Card.Header>
@@ -33,9 +33,12 @@ function Account() {
                 </Card.Body>
                 <ListGroup>
                     <ListGroup.Item>Total debit:</ListGroup.Item>
-                    <ListGroup.Item>Total credit</ListGroup.Item>
+                    <ListGroup.Item>
+                        <Link to={`/client/chequedeposit/${account.id}`}>Deposit a cheque</Link>
+                    </ListGroup.Item>
                 </ListGroup>
-            </Card>        </Col>
+            </Card>        
+        </Col>
         </>
     )
 }

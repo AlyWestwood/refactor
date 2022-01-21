@@ -4,7 +4,7 @@
 
 import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../misc/AuthContext";
 import { Card, Form, Button, Row, Col } from "react-bootstrap";
 import { reqHeader } from "../../misc/reqHeader";
@@ -22,12 +22,21 @@ function Deposit() {
 
 //   const [file, setFile] = useState(null);
   const [accountList, setAccountList] = useState([]);
+  const [singleAccount, setSingleAccount] = useState({})
+  const params = useParams();
 
   useEffect(() => {
+      
+    if(!params.accountId){
     axios.get('/accounts/totals', reqHeader)
     .then(res => setAccountList(res.data.accountTotals))
     .catch(err => console.log(err.response.data));
-  }, []);
+    } else {
+        axios.get(`/accounts/singleAccount/${params.accountId}`, reqHeader)
+        .then(res => setSingleAccount(res.data.account))
+        .catch(err => console.log(err.response.data))
+    }
+  }, [params]);
 
   const submitFile = submit => {
       submit.preventDefault();
@@ -69,7 +78,7 @@ function Deposit() {
       })
       // handle success
   };
-
+console.log(params.accountId)
   return (
     <Card className='col-7'>
         <Card.Header>Deposit a cheque</Card.Header>
@@ -79,8 +88,9 @@ function Deposit() {
         <Col>
         <Form.Group controlId='payeeAccount'>
             <Form.Label>Account</Form.Label>
-            <Form.Select defaultValue='null' onChange={(event) => {}}>
-                <option value='null' disabled>Select</option>
+            <Form.Select defaultValue={params.accountId ? parseInt(params.accountId) : 'null'} >
+                {!params.accountId && <option value='null' disabled>Select</option>}
+                {params.accountId && <option value={params.accountId}>Account #{params.accountId} - {singleAccount.currency} {singleAccount.accountType}</option>}
                 {accountList.map(account => {
                     return <option key={account.accountId} value={account.accountId}>Account #{account.accountId} - {account.currency} {account.accountType}</option>
                 })}

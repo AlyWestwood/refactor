@@ -51,7 +51,9 @@ function App() {
                   {/* <Route path=":accountId/chequedeposit" element={<Deposit/>}/> */}
                   <Route path="openAccount" element={<NewAccountC/>}/>
                 </Route>
-                <Route path="chequedeposit" element={<Deposit/>}/>
+                <Route path="chequedeposit" element={<Deposit/>}>
+                  <Route path=":accountId" element={<Deposit/>}/>
+                </Route>
                 {/* <Route path="/requestpayment" element={</>}/> */}
                 <Route path="paybills" element={<PayBills/>}/>
                 <Route path="transactions" element={<Transactions/>}/>
