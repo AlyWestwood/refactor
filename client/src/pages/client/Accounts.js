@@ -3,8 +3,8 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {Link, Outlet, useLocation } from 'react-router-dom';
-import { Card, Col, ListGroup, Nav } from 'react-bootstrap'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Card, Col, ListGroup, Nav } from 'react-bootstrap';
 import axios from 'axios';
 import { reqHeader } from '../../misc/reqHeader';
 import DisplayAccount from '../../components/DisplayAccount';
@@ -13,6 +13,7 @@ function Accounts() {
     const [accountList, setAccountList] = useState([]);
     const [totals, setTotals] = useState(null);
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         axios.get('/accounts/getAccounts', reqHeader)
@@ -53,9 +54,9 @@ function Accounts() {
         <Col lg={9}>
             {accountList.map(account => {
                 return (
-                    <>
+                    <div onClick={() => navigate(`/client/accounts/${account.id}`)}>
                     <DisplayAccount key={"account" + account.id} value = {account} />
-                    </>
+                    </div>
                 )
             })}
   
@@ -68,7 +69,7 @@ function Accounts() {
                 <Card.Body>
                     <Card.Title>
                         Grand total assets<br/>
-                        CAD ${/*totals ? totals.totalBalanceInCad.toFixed(2) : '...'*/}
+                        CAD ${totals ? totals.totalBalanceInCad.toFixed(2) : '...'}
                     </Card.Title>
                 </Card.Body>
                 <ListGroup>

@@ -48,6 +48,7 @@ function App() {
               <Route path="" element={<ClientHome/>}/>
                 <Route path="accounts" element={<Accounts/>}>
                   <Route path=":accountId" element={<Account/>}/>
+                  {/* <Route path=":accountId/chequedeposit" element={<Deposit/>}/> */}
                   <Route path="openAccount" element={<NewAccountC/>}/>
                 </Route>
                 <Route path="chequedeposit" element={<Deposit/>}/>

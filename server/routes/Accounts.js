@@ -65,12 +65,13 @@ router.get("/totals", validateToken, async (req, res) => {
       }
     }
 
-    if (listOfAccounts[i].currency !== "CAD") {
+    if (listOfAccounts[i].currency !== "CAD" && listOfAccounts[i].balance != 0) {
       await exchangeCurrency(
         listOfAccounts[i].currency,
         "CAD",
         listOfAccounts[i].balance
       ).then((response) => {
+        console.log(response)
         account.equivalentBalance = response;
         totalConverted += response;
       });

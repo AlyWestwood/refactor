@@ -18,7 +18,7 @@ function DisplayAccount({value}){
     
     return (
         <>
-        <Card className='m-3' key={value.id} onClick={() => navigate(`${value.id}`)}>
+         <Card className='m-3' key={value.id} > {/* onClick={() => navigate(`/client/accounts/${value.id}`)}*/}
             <Card.Header className='text-start h5'><Row><Col className=''>{value.accountType === 'debit' ? 'Debit' : 'Credit'} - {value.currency}</Col><Col className='text-end'>Account #: {value.id}</Col></Row></Card.Header>
             <Card.Body>
                 <Card.Title className='text-end'>Balance: ${value.balance}</Card.Title>
@@ -27,7 +27,13 @@ function DisplayAccount({value}){
             <ListGroup>
                 {transactionList.map(transaction => {
                     return (
-                        <ListGroup.Item key={transaction.id}>{assignTransaction(transaction, value.id)}</ListGroup.Item>
+                        <ListGroup.Item 
+                            key={'transaction'+transaction.id} 
+                            onClick={() =>{
+                                alert('transaction # ' + transaction.id)
+                            }}>
+                                {assignTransaction(transaction, value.id)}
+                        </ListGroup.Item>
                         )})}
             </ListGroup>
         </Card>
@@ -35,7 +41,9 @@ function DisplayAccount({value}){
     )
 }
 
-
+function DisplayTransaction(transaction){
+    return <div>something</div>
+}
 
 function parseDate(date){
     const formatDate = new Intl.DateTimeFormat('en-GB', {day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true});

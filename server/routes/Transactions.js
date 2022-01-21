@@ -348,7 +348,7 @@ router.post("/depositCheque", validateToken, async (req, res) => {
   //   chequeNumber: 265,
   // };
   // const { payeeAccountId, payerAccountId, value, chequeNumber } = tempData;
-  const { payeeAccountId, payerAccountId, value } = req.body;
+  const { payeeAccountId, payerAccountId, value, chequeNumber } = req.body;
   const targetAccount = await Accounts.findOne({
     where: { id: payeeAccountId, userId: userId, activeStatus: "active" },
   });
