@@ -31,32 +31,6 @@ function Login() {
     });
   };
   return (
-    // <div className="col-5 card">
-    //   <div className="card-header">Log In</div>
-    //   <div className="card-body">
-    //   <div className="mb-3">
-    //   <label className="form-label">email:</label>
-    //   <input
-    //     type="text"
-    //     onChange={event => {
-    //       setEmail(event.target.value);
-    //     }}
-    //     className="form-control"
-    //   />
-    //   </div>
-    //   <div className="mb-3">
-    //   <label className="form-label">Password:</label>
-    //   <input
-    //     type="password"
-    //     onChange={event => {
-    //       setPassword(event.target.value);
-    //     }}
-    //     className="form-control"
-    //   />
-    //   </div>
-    //   <button onClick={login} className="btn btn-primary"> Login </button>
-    //   </div>
-    // </div>
     <>
     <Card className='col-5'>
       <Card.Header>Log In</Card.Header>

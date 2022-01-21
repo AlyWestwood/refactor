@@ -35,7 +35,10 @@ function Client(){
 
 function Admin(){
     return (
-        <Nav.Link href="/account">Admin Accounts</Nav.Link>
+        <>
+        <Nav.Link href="/admin/accounts">Accounts</Nav.Link>
+        <Nav.Link href="/admin/users">Users</Nav.Link>
+        </>
     )
 }
 

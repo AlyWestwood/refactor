@@ -1,27 +1,41 @@
+/*  IMPORTS */
 
-import React, { useContext } from 'react';
-import './bootstrap.scss';
-import './App.css';
-import { BrowserRouter as Router, Route, Routes, Outlet, Navigate } from 'react-router-dom';
-import Home from './pages/common/Home';
-import { Login, Logout } from './pages/common/Login';
-import Register from './pages/common/Register.js';
-import NewAccountA from './pages/admin/NewAccount';
-import TransferA from './pages/admin/Transfer';
-import Accounts from './pages/client/Accounts';
-import Account from './pages/client/Account';
-import Deposit from './pages/client/Deposit';
-import NewAccountC from './pages/client/NewAccount';
-import PayBills from './pages/client/PayBills';
-import Transactions from './pages/client/Transactions';
-import TransferC from './pages/client/Transfer';
-import Header from './components/Header';
-import GetAuth from './misc/GetAuth';
-import Footer from './components/Footer'
-import FileUpload from './FileUpload';
-import DisplayCheque from './DisplayCheque';
-import {Container, Row} from 'react-bootstrap';
-import { AuthContext } from './misc/AuthContext';
+  /* plugins, styles */
+  import React, { useContext } from 'react';
+  import { BrowserRouter as Router, Route, Routes, Outlet, Navigate } from 'react-router-dom';
+  import { Container, Row } from 'react-bootstrap';
+  
+  /* common pages, components, styles, helpers */
+  import './bootstrap.scss';
+  import './App.css';
+  import Home from './pages/common/Home';
+  import { Login, Logout } from './pages/common/Login';
+  import Register from './pages/common/Register.js';
+  import GetAuth from './misc/GetAuth';
+  import Header from './components/Header';
+  import Footer from './components/Footer'
+  import FileUpload from './FileUpload';
+  import DisplayCheque from './DisplayCheque';
+  import { AuthContext } from './misc/AuthContext';
+
+  /* client pages */
+  import Accounts from './pages/client/Accounts';
+  import Account from './pages/client/Account';
+  import NewAccountC from './pages/client/NewAccount';
+  import Deposit from './pages/client/Deposit';
+  import PayBills from './pages/client/PayBills';
+  import Transactions from './pages/client/Transactions';
+  import TransferC from './pages/client/Transfer';
+
+  /* admin pages */
+  import AdminAccounts from './pages/admin/Accounts';
+  import NewAccountA from './pages/admin/NewAccount';
+  import TransferA from './pages/admin/Transfer';
+  import Users from './pages/admin/Users';
+  import User from './pages/admin/User';
+
+/* IMPORTS END */
+
 
 function App() {
 
@@ -62,8 +76,12 @@ function App() {
 
         {/* admin routes */}
           <Route path="admin" element={<Admin/>}>
-            <Route path="transfer" element={<TransferA/>}/>
+            <Route path="accounts" element={<AdminAccounts/>}/>
             <Route path="openAccount" element={<NewAccountA/>}/>
+            <Route path="transfer" element={<TransferA/>}/>
+            <Route path="users" element={<Users/>}>
+              <Route path=":userId" element={<User/>}/>
+            </Route>
           </Route>
         </Route>
 
@@ -91,33 +109,37 @@ function Layout() {
 
 function Admin() {
   const state = useContext(AuthContext);
-  console.log(state)
-  return state.authState === null ? 
-    <div>Loading...</div> : state.authRole === null ? 
-    <div>Loading...</div> : state.authRole === 'admin' ? 
-    <Outlet/> : <Navigate to='/login'/>
-  
-}
-
-function Client() {
-  const state = useContext(AuthContext);
-  // return state.authState === null ? 
-  //   <div>Loading...</div> : state.authUser.role === null ? 
-  //   <div>Loading...</div> : state.authUser.role === 'client' ? 
-  //   state.authUser.status === 'active' ?
-  //     <Outlet /> : state.authUser.status === 'inactive' ?
-  //       <div>Sit tight!<br/>You haven't been approved yet</div> : <Navigate to='/login'/> :
-  //   <Navigate to='/login'/>
-
-  // if(state.authState === null){
-  //   return <div>Loading...</div>
-  // }
   if(state.authState === false){
     return <Navigate to='/login'/>
   }
   if(state.authState === true){    
+    if(state.authUser.role === 'client'){
+      return <Navigate to='/client'/>
+    }
     if(state.authUser.role === 'admin'){
-      <Navigate to='/admin'/>
+      switch(state.authUser.status){
+        case 'disabled':
+          return <Navigate to='/login'/>
+        case 'inactive':
+          return <div>Your account has not yet been approved</div>
+        case 'active':
+          return <Outlet />
+        default:
+          break;
+      }
+    }
+  }
+  return <div>Loading...</div>
+}
+
+function Client() {
+  const state = useContext(AuthContext);
+  if(state.authState === false){
+    return <Navigate to='/login'/>
+  }
+  if(state.authState === true){
+    if(state.authUser.role === 'admin'){
+      return <Navigate to='/admin'/>
     }
     if(state.authUser.role === 'client'){
       switch(state.authUser.status){
