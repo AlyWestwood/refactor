@@ -1,9 +1,9 @@
 const axios = require("axios");
 const AWS = require("aws-sdk");
 const fs = require("fs");
-const multiparty = require("multiparty");
+
 const detect = require("detect-file-type");
-const {Cheques} = require("../models");
+const { Cheques } = require("../models");
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -13,48 +13,41 @@ AWS.config.update({
 // Create S3 service object
 var s3 = new AWS.S3({ apiVersion: "2006-03-01" });
 
-function uploadCheque(req) {
-  return new Promise((resolve, reject) => {
-    const form = new multiparty.Form();
-    form.parse(req, async (error, fields, files) => {
-      if (error) {
-        reject(error);
-      }
-      try {
-        const path = files.file[0].path;
-        const buffer = fs.readFileSync(path);
-        let type = "jpg";
-        await detect.fromBuffer(buffer, (err, result) => {
-          type = result.ext;
-        });
-        const fileName = `cheques/${Date.now().toString()}`;
-        const data = await uploadToS3(buffer, fileName, type);
-        console.log(data);
-        resolve(data);
-      } catch (err) {
-        console.log(err);
-        reject(err);
-      }
+async function uploadCheque(path) {
+  return await new Promise((resolve, reject) => {
+    const buffer = fs.readFileSync(path);
+    let type = "jpg";
+    detect.fromBuffer(buffer, (err, result) => {
+      type = result.ext;
+      const fileName = `cheques/${Date.now().toString()}`;
+      uploadToS3(buffer, fileName, type).then((result) => {
+        console.log(result);
+        resolve(result);
+      });
     });
   });
 }
 
 async function downloadCheque(chequeId) {
-    return new Promise((resolve, reject) => {
-        Cheques.findByPk(chequeId).then((result1) => {
-            downloadFromS3(result1.s3key).then((result2) => {
-                console.log("result2")
-                console.log(result2)
-                resolve(result2);
-            }).catch((error) => {
-                console.log("error" + error);
-                reject(err);
-            })
-        }).catch((err) => {
-            console.log("err: " + err);
+  return new Promise((resolve, reject) => {
+    Cheques.findByPk(chequeId)
+      .then((result1) => {
+        downloadFromS3(result1.s3key)
+          .then((result2) => {
+            console.log("result2");
+            console.log(result2);
+            resolve(result2);
+          })
+          .catch((error) => {
+            console.log("error" + error);
             reject(err);
-        })
-    })
+          });
+      })
+      .catch((err) => {
+        console.log("err: " + err);
+        reject(err);
+      });
+  });
 }
 
 const downloadFromS3 = async (key) => {
@@ -79,7 +72,7 @@ const uploadToS3 = async (buffer, name, type) => {
 
 const exchangeCurrency = async (originCurrency, targetCurrency, value) => {
   return await new Promise((resolve, reject) => {
-    if (targetCurrency !== originCurrency) {
+    if (targetCurrency !== originCurrency && value != 0) {
       const url =
         "https://v6.exchangerate-api.com/v6/" +
         process.env.EXCHANGEAPIKEY +
@@ -102,4 +95,10 @@ const exchangeCurrency = async (originCurrency, targetCurrency, value) => {
   });
 };
 
-module.exports = { exchangeCurrency, downloadFromS3, uploadCheque, downloadCheque };
+module.exports = {
+  exchangeCurrency,
+  downloadFromS3,
+  uploadToS3,
+  downloadCheque,
+  uploadCheque,
+};
