@@ -4,6 +4,7 @@ const { RecurringPayments, Accounts, Transactions } = require("../models");
 const db = require("../models/index");
 const sgMail = require("@sendgrid/mail");
 const { exchangeCurrency } = require("../utils/utils");
+const { Op } = require("sequelize");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 function cron() {
@@ -12,26 +13,66 @@ function cron() {
 
     checkWarnings();
     checkRecurringPayments();
+    checkCreditUpdates();
   });
 }
 
-function checkCreditUpdates() {
+async function checkCreditUpdates() {
+  const creditFeesDueAccounts = await Accounts.findAll({
+    where: {
+      nextPaymentDueDate: { [Op.lte]: new Date() },
+      balance: { [Op.gt]: 0 },
+      activeStatus: "active",
+    },
+  });
 
+  // for (let i = 0; i < creditFeesDueAccounts.length; i++) {
+  //   const account = creditFeesDueAccounts[i];
+
+  //   const today = new Date().setUTCHours(0, 0, 0, 0);
+  //   const dbDate = new Date(account.nextPaymentDueDate).setUTCHours(0, 0, 0, 0);
+
+  //   //if this is the first time we're seeing this account (ie, it's today), decide the minimum payment and calculate the interest on this balance for the 
+  //   let updateValues = {};
+  //   if (dbDate === today) {
+  //     const minimumPayment = account.balance * 0.10;
+  //     const accruedInterest =  Number(account.balance) * (Number(account.interestRate) / 100 );
+  //     updateValues.minimumPayment = minimumPayment;
+  //     updateValues.balance = Number(account.balance) + Number(accruedInterest);
+  //   }
+
+  //   const dateModifier = new Date(dbDate);
+  //   dateModifier.setDate(dateModifier.getDate() + 5);
+  //   if(dateModifier <= new Date() && account.minimumPayment > 0){
+  //     console.log("over 5 days");
+  //     updateValues.latePaymentFees = Number(account.latePaymentFees) + 5;
+  //   }
+
+  //   console.log(updateValues);
+  //   Accounts.update(updateValues, {where: {id: account.id}}).then((result) => {
+  //     console.log(result)
+    // });
+  // }
+  //add interest to balance
 }
 
 async function checkRecurringPayments() {
-  console.log("on checkrecurringpay")
-  const recurringPayment = await RecurringPayments.findAll({where: {activeStatus: "active", paymentDate: new Date()}});
+  const recurringPayment = await RecurringPayments.findAll({
+    where: { activeStatus: "active", paymentDate: new Date() },
+  });
 
-  for(let i = 0; i < recurringPayment.length; i++){
-    console.log(recurringPayment[i].id)
+  for (let i = 0; i < recurringPayment.length; i++) {
+    console.log(recurringPayment[i].id);
     let success = await recurringTransactions(recurringPayment[i]);
-    if(success !== "error"){
+    if (success !== "error") {
       //update next date
       const dateModifier = new Date(recurringPayment[i].paymentDate);
       const numberOfDaysToAdd = recurringPayment[i].interval;
       dateModifier.setDate(dateModifier.getDate() + numberOfDaysToAdd);
-      RecurringPayments.update({paymentDate: dateModifier}, {where: {id: recurringPayment[i].id}})
+      RecurringPayments.update(
+        { paymentDate: dateModifier },
+        { where: { id: recurringPayment[i].id } }
+      );
     }
   }
 }
@@ -63,7 +104,7 @@ async function recurringTransactions(recurringPayment) {
     status: "pending",
     payeeAccount: payeeAccountId,
     payerAccount: payerAccountId,
-    recurringPaymentId: recurringPayment.id
+    recurringPaymentId: recurringPayment.id,
   };
 
   let transactionResult;
@@ -212,4 +253,4 @@ function email(to, firstName, lastName, message, warning) {
     });
 }
 
-module.exports = { cron, checkRecurringPayments };
+module.exports = { cron, checkRecurringPayments, checkCreditUpdates};

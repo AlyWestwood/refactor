@@ -19,6 +19,8 @@ const {
   downloadCheque,
 } = require("../utils/utils");
 const Op = require("Sequelize").Op;
+const multiparty = require("multiparty");
+
 
 /**
  * gets transactions of specific account after verifying account can be accessed by logged in user
@@ -197,7 +199,7 @@ router.post("/transferFunds", validateToken, async (req, res) => {
     !originAccount ||
     !targetAccount ||
     originAccount.activeStatus !== "active" ||
-    targetAccount.activeStatus !== "active" 
+    targetAccount.activeStatus !== "active"
   ) {
     return res.status(403).json("Cannot transfer funds with this account");
   }
@@ -335,12 +337,37 @@ router.get("/cheques/:chequeId/:accessToken", async (req, res) => {
 });
 
 router.post("/depositCheque", validateToken, async (req, res) => {
-  const uploadResult = await uploadCheque(req);
   const userId = req.userId;
-  console.log(uploadResult);
-  if (!uploadResult) {
-    return res.status(400).json({ error: "could not record cheque" });
+
+  const form = new multiparty.Form();
+  let request;
+  await new Promise(async (resolve, reject) => {
+    form.parse(req, async (error, fields, files) => {
+      if (error) {
+        reject(error);
+      }
+      try {
+        const path = files.file[0].path;
+        if(!path) reject("No file uploaded");
+        const body = { path: path, fields: fields };
+        resolve(body);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }).then((result) => {
+    request = result;
+    console.log(result);
+  }).catch((err) => {
+    console.log(err);
+  });
+
+  if(!request){
+    return res.status(400).json("Bad request");
   }
+  const uploadResult = await uploadCheque(request.path);
+  const { payeeAccountId, payerAccountId, value, chequeNumber } = request.fields;
+  
   // const tempData = {
   //   payeeAccountId: 3,
   //   payerAccountId: 2,
@@ -348,29 +375,28 @@ router.post("/depositCheque", validateToken, async (req, res) => {
   //   chequeNumber: 265,
   // };
   // const { payeeAccountId, payerAccountId, value, chequeNumber } = tempData;
-  const { payeeAccountId, payerAccountId, value, chequeNumber } = req.body;
+
   const targetAccount = await Accounts.findOne({
     where: { id: payeeAccountId, userId: userId, activeStatus: "active" },
   });
-  const originAccount = await Accounts.findOne({where: {id: payerAccountId, activeStatus: "active"}});
+  const originAccount = await Accounts.findOne({
+    where: { id: payerAccountId, activeStatus: "active" },
+  });
 
   if (
     !originAccount ||
     !targetAccount ||
     originAccount.accountType === "credit" ||
-    payeeAccountId === payerAccountId || originAccount.userId === targetAccount.userId
+    payeeAccountId === payerAccountId ||
+    originAccount.userId === targetAccount.userId
   ) {
     return res.status(403).json("Unable to transfer to that account");
   }
   const duplicateCheques = await Cheques.findAll({
     where: { payerAccount: payerAccountId, chequeNumber: chequeNumber },
   });
-  if (duplicateCheques) {
-    for (let i = 0; i < duplicateCheques.length; i++) {
-      if (duplicateCheques[i].status !== "on hold") {
-        return res.status(400).json("That check has already been deposited");
-      }
-    }
+  if (duplicateCheques.length > 0) {
+      return res.status(400).json("That check has already been deposited");
   }
 
   const chequeData = {
@@ -382,7 +408,7 @@ router.post("/depositCheque", validateToken, async (req, res) => {
     chequeNumber: chequeNumber,
   };
   let chequeId;
-  const cheque = await Cheques.create(chequeData).then(
+  await Cheques.create(chequeData).then(
     (response) => (chequeId = response.id)
   );
   const targetValue = await exchangeCurrency(
@@ -413,6 +439,7 @@ router.post("/depositCheque", validateToken, async (req, res) => {
     .catch((error) => {
       return res.status(400).json(error);
     });
+    
 });
 
 /**
