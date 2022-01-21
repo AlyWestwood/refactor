@@ -1,7 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { Users } = require("../models");
-const { Transactions, Accounts, Cheques } = require("../models");
+const db = require("../models/index");
+const {
+  Transactions,
+  Accounts,
+  Cheques,
+  RecurringPayments,
+} = require("../models");
 const {
   validateToken,
   validateTokenDirect,
@@ -58,6 +63,120 @@ router.get(
 );
 
 /**
+ * set up a recurring payment
+ * interval in days
+ */
+
+router.post("/recurringPayments", validateToken, async (req, res) => {
+  const userId = req.userId;
+  const { payerAccountId, payeeAccountId, originValue, interval, startDate } =
+    req.body;
+
+  const payerAccount = await Accounts.findOne({
+    where: { id: payerAccountId, userId: userId },
+  });
+  const payeeAccount = await Accounts.findByPk(payeeAccountId);
+
+  if (
+    !payerAccount ||
+    !payeeAccount ||
+    payerAccount.userId === payeeAccount.userId ||
+    payerAccountId === payeeAccountId ||
+    payerAccount.activeStatus !== "active" ||
+    payeeAccount.activeStatus !== "active"
+  ) {
+    return res
+      .status(400)
+      .json("Cannot create a recurring payment with these accounts");
+  }
+
+  const startDateObj = new Date(startDate);
+
+  if (startDateObj <= new Date()) {
+    return res.status(400).json("Start date must be after today");
+  }
+
+  if (originValue < 1) {
+    return res.status(400).json("The payment value must be more than 1");
+  }
+
+  if (interval < 1) {
+    return res
+      .status(400)
+      .json("The recurring interval must be at least 1 day");
+  }
+
+  const recurringPayment = {
+    payerAccount: payerAccountId,
+    payeeAccount: payeeAccountId,
+    originValue: originValue,
+    activeStatus: "active",
+    paymentDate: startDate,
+    interval: interval,
+  };
+  RecurringPayments.create(recurringPayment)
+    .then((response) => {
+      return res.json("Successfully created a recurring payment");
+    })
+    .catch((err) => {
+      return res.status(400).json(err);
+    });
+});
+
+/**
+ * cancel recurring payment - sets to disabled in db
+ * params - logged in user, recurring payment id
+ */
+router.put("/cancelRecurringPayment", validateToken, (req, res) => {
+  const { recurringPaymentId } = req.body;
+  const userId = req.userId;
+
+  db.sequelize
+    .query(
+      "select accounts.userId as userId from recurringPayments join accounts on accounts.id = recurringPayments.payerAccount where recurringPayments.id = ?",
+      { replacements: [recurringPaymentId] }
+    )
+    .then((response) => {
+      if (response[0].length > 0) {
+        //result
+        RecurringPayments.update(
+          { activeStatus: "inactive" },
+          { where: { id: recurringPaymentId } }
+        );
+        return res.json("Disabled recurring payment");
+      } else {
+        //no result
+        res.status(400).json("Cannot cancel this recurring payment");
+      }
+    });
+});
+
+/**
+ * return active recurring payments by account - not user
+ */
+router.get(
+  "/recurringPayments/:accountNumber",
+  validateToken,
+  async (req, res) => {
+    const userId = req.userId;
+    const { accountNumber } = req.params;
+
+    const recurringPayments = await RecurringPayments.findAll({
+      where: { payerAccount: accountNumber },
+    });
+    if (recurringPayments.length > 0) {
+      const account = await Accounts.findByPk(
+        recurringPayments[0].payerAccount
+      );
+      if (account.userId === userId) {
+        return res.json(recurringPayments);
+      }
+    }
+    return res.json("No recurring payments on this accounts");
+  }
+);
+
+/**
  * post here when a user creates a transaction - requesting payment, transferring funds, paying fees
  *
  * params: logged in user, target account id, origin account id, value (in origin account currency)
@@ -78,7 +197,7 @@ router.post("/transferFunds", validateToken, async (req, res) => {
     !originAccount ||
     !targetAccount ||
     originAccount.activeStatus !== "active" ||
-    targetAccount.activeStatus !== "active"
+    targetAccount.activeStatus !== "active" 
   ) {
     return res.status(403).json("Cannot transfer funds with this account");
   }
@@ -186,13 +305,11 @@ router.get("/cheques/:chequeId/:accessToken", async (req, res) => {
     !cheque ||
     (cheque.uploadedBy !== userId && cheque.payerAccount !== userId)
   ) {
-    return res
-      .status(403)
-      .json({
-        error: "User not authorized",
-        cheque: cheque,
-        validate: validate,
-      });
+    return res.status(403).json({
+      error: "User not authorized",
+      cheque: cheque,
+      validate: validate,
+    });
   }
 
   //   downloadFromS3(chequeId)
@@ -231,17 +348,17 @@ router.post("/depositCheque", validateToken, async (req, res) => {
   //   chequeNumber: 265,
   // };
   // const { payeeAccountId, payerAccountId, value, chequeNumber } = tempData;
-  const { payeeAccountId, payerAccountId, value} = req.body;
+  const { payeeAccountId, payerAccountId, value } = req.body;
   const targetAccount = await Accounts.findOne({
-    where: { id: payeeAccountId, userId: userId },
+    where: { id: payeeAccountId, userId: userId, activeStatus: "active" },
   });
-  const originAccount = await Accounts.findByPk(payerAccountId);
+  const originAccount = await Accounts.findOne({where: {id: payerAccountId, activeStatus: "active"}});
 
   if (
     !originAccount ||
     !targetAccount ||
     originAccount.accountType === "credit" ||
-    payeeAccountId === payerAccountId
+    payeeAccountId === payerAccountId || originAccount.userId === targetAccount.userId
   ) {
     return res.status(403).json("Unable to transfer to that account");
   }
