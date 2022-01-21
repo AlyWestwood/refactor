@@ -27,7 +27,7 @@ const navigate = useNavigate();
 
     return (
         <>
-        <Card className='col-5'>
+        <Card className='col-5 m-3'>
             <Card.Header >Create a New Account</Card.Header>
             <Card.Body>
                 <Form onSubmit={createAccount}>

@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { reqHeader } from '../../misc/reqHeader';
 import DisplayAccount from '../../components/DisplayAccount';
-import { Row, Col, Card, ListGroup } from 'react-bootstrap';
+import { Col, Card, ListGroup } from 'react-bootstrap';
 
 function Account() {
     const params = useParams();

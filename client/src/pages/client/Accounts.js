@@ -3,44 +3,58 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {Link, useNavigate, useParams, Outlet } from 'react-router-dom';
-import { Card, Col, Row, ListGroup } from 'react-bootstrap'
+import {Link, Outlet, useLocation } from 'react-router-dom';
+import { Card, Col, ListGroup, Nav } from 'react-bootstrap'
 import axios from 'axios';
 import { reqHeader } from '../../misc/reqHeader';
 import DisplayAccount from '../../components/DisplayAccount';
 
 function Accounts() {
     const [accountList, setAccountList] = useState([]);
-    const [totalDebit, setTotalDebit] = useState();
-    const [totalCredit, setTotalCredit] = useState(0);
-    const params = useParams();
+    const [totals, setTotals] = useState(null);
+    const location = useLocation();
 
     useEffect(() => {
-        axios.get('/accounts/getAccounts', reqHeader).then(res => {
-            setAccountList(res.data.listOfAccounts);
-            let debit = 0;
-            for(var account in res.data.listOfAccounts){
-                if(account.accountType === 'debit'){
-                    debit += account.balance
-                }
-            }
-            setTotalDebit(debit);
-        });
-
+        axios.get('/accounts/getAccounts', reqHeader)
+        .then(res => setAccountList(res.data.listOfAccounts))
+        .catch(err => alert('Accounts error: ' + err.response.data.error));
+    }, []);
+    
+    useEffect(() => {
+        axios.get('/accounts/totals', reqHeader)
+        .then(res => {
+            console.log(res.data)
+            setTotals(res.data)})
+        .catch(err => console.log(err.response));
     }, [])
 
-    if(params.accountId){
-        return <Outlet/>
+    console.log(location.pathname)
+    if(location.pathname !== '/client/accounts'){
+        return (
+            <>
+            <Nav variant='tabs' className='justify-content-end text-start' >
+                <Nav.Item>
+                    <Nav.Link href='/client/accounts'>Back to Accounts</Nav.Link>
+                </Nav.Item>
+            </Nav>
+            <Outlet/>
+            </>
+            )
     }
 
     return (
         <>
+        <Nav variant='tabs' className='justify-content-end text-start' >
+            <Nav.Item>
+                <Nav.Link href='/client/accounts/openAccount'>New Account</Nav.Link>
+            </Nav.Item>
+        </Nav>
         <h1 className='text-start'>Accounts Overview</h1>
-        <Col md={9}>
+        <Col lg={9}>
             {accountList.map(account => {
                 return (
                     <>
-                    <DisplayAccount key={account.id} value = {account} />
+                    <DisplayAccount key={"account" + account.id} value = {account} />
                     </>
                 )
             })}
@@ -52,14 +66,16 @@ function Accounts() {
                     words
                 </Card.Header>
                 <Card.Body>
-                    <Link to='/client/openAccount'>Open a new account</Link>
-                    <Card.Text>
-                        Grand total assets
-                    </Card.Text>
+                    <Card.Title>
+                        Grand total assets<br/>
+                        CAD ${/*totals ? totals.totalBalanceInCad.toFixed(2) : '...'*/}
+                    </Card.Title>
                 </Card.Body>
                 <ListGroup>
-                    <ListGroup.Item>Total debit: ${totalDebit}</ListGroup.Item>
-                    <ListGroup.Item>Total credit</ListGroup.Item>
+                    <ListGroup.Item>Total CAD ${totals ? totals.totalForeign.totalCAD.toFixed(2) : '...'}</ListGroup.Item>
+                    <ListGroup.Item>Total USD ${totals ? totals.totalForeign.totalUSD.toFixed(2) : '...'}</ListGroup.Item>
+                    <ListGroup.Item>Total EUR €{totals ? totals.totalForeign.totalEUR.toFixed(2) : '...'}</ListGroup.Item>
+                    <ListGroup.Item>Total GBP £{totals ? totals.totalForeign.totalGBP.toFixed(2) : '...'}</ListGroup.Item>
                 </ListGroup>
             </Card>
         </Col>

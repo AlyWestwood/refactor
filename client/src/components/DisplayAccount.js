@@ -11,13 +11,11 @@ function DisplayAccount({value}){
     useEffect(() => {
         axios.get(`/transactions/byAccount/${value.id}`, reqHeader)
         .then(res => {
-            console.log(res.data);
             setTransactionList(res.data);
             // console.log(transactionList)
         })
     }, [value]);
     
-    console.log(transactionList);
     return (
         <>
         <Card className='m-3' key={value.id} onClick={() => navigate(`${value.id}`)}>

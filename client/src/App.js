@@ -48,13 +48,13 @@ function App() {
               <Route path="" element={<ClientHome/>}/>
                 <Route path="accounts" element={<Accounts/>}>
                   <Route path=":accountId" element={<Account/>}/>
+                  <Route path="openAccount" element={<NewAccountC/>}/>
                 </Route>
                 <Route path="chequedeposit" element={<Deposit/>}/>
                 {/* <Route path="/requestpayment" element={</>}/> */}
                 <Route path="paybills" element={<PayBills/>}/>
                 <Route path="transactions" element={<Transactions/>}/>
                 <Route path="transfer" element={<TransferC/>}/>
-                <Route path="openAccount" element={<NewAccountC/>}/>
             </Route>
 
         {/* admin routes */}
