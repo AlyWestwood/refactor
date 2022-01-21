@@ -23,6 +23,9 @@ $card-cap-bg: $secondary;
 $card-cap-color: whitesmoke;
 $card-border-color: rgba(#000, .25);
 
+//modals
+$modal-content-border-radius: 1rem;
+
 @import '~bootstrap/scss/bootstrap.scss';
 // scss-docs-start import-stack
 // Configuration

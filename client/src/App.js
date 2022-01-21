@@ -98,7 +98,7 @@ function Layout() {
     <>
       <Header />
         <Container>
-        <Row className='my-4 gx-0 justify-content-md-center'>
+        <Row className='my-4 gx-0 justify-content-md-center text-start'>
           <Outlet/>
         </Row>
         </Container>
