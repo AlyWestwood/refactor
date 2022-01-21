@@ -8,6 +8,7 @@ import { Login, Logout } from './pages/common/Login';
 import Register from './pages/common/Register.js';
 import NewAccountA from './pages/admin/NewAccount';
 import TransferA from './pages/admin/Transfer';
+import Accounts from './pages/client/Accounts';
 import Account from './pages/client/Account';
 import Deposit from './pages/client/Deposit';
 import NewAccountC from './pages/client/NewAccount';
@@ -45,7 +46,9 @@ function App() {
         {/* client routes */}
             <Route path="client" element={<Client/>}>
               <Route path="" element={<ClientHome/>}/>
-                <Route path="account" element={<Account/>}/>
+                <Route path="accounts" element={<Accounts/>}>
+                  <Route path=":accountId" element={<Account/>}/>
+                </Route>
                 <Route path="chequedeposit" element={<Deposit/>}/>
                 {/* <Route path="/requestpayment" element={</>}/> */}
                 <Route path="paybills" element={<PayBills/>}/>

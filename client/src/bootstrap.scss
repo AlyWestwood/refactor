@@ -4,7 +4,8 @@
  * Copyright 2011-2021 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
-// @import "functions";
+@import "~bootstrap/scss/functions";
+// @import '~bootstrap/scss/variables';
 
 $primary: #8e59FF;
 $secondary: #2C3135;
@@ -15,7 +16,8 @@ $btn-font-family: "Arial Rounded MT Bold";
 $btn-border-radius: .3rem;
 
 //cards
-$card-border-radius: 1em;
+$card-border-radius: 1rem;
+$card-inner-border-radius:  subtract($card-border-radius, 1px);
 $card-header-bg: purple;
 $card-cap-bg: $secondary;
 $card-cap-color: whitesmoke;
