@@ -26,7 +26,7 @@ app.use("/accounts", accountsRouter);
 
 db.sequelize.sync().then(() => {
     cron();
-    checkCreditUpdates();
+    // checkCreditUpdates();
     app.listen(process.env.PORT, () => {
     console.log("running on port " + process.env.PORT);
 });
