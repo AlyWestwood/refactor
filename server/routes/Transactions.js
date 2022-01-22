@@ -21,7 +21,6 @@ const {
 const Op = require("Sequelize").Op;
 const multiparty = require("multiparty");
 
-
 /**
  * gets transactions of specific account after verifying account can be accessed by logged in user
  *
@@ -79,7 +78,7 @@ router.post("/recurringPayments", validateToken, async (req, res) => {
   });
   const payeeAccount = await Accounts.findByPk(payeeAccountId);
 
-  if(originValue < 1){
+  if (originValue < 1) {
     return res.status(400).json("Cannot have a negative value");
   }
 
@@ -158,6 +157,21 @@ router.put("/cancelRecurringPayment", validateToken, (req, res) => {
 });
 
 /**
+ * recurring payments by user 
+ */
+router.get("/recurringPayments", validateToken, async (req, res) => {
+  const userId = req.userId;
+  db.sequelize
+    .query(
+      'select paymentDate, originValue, `interval`, payerAccount, payeeAccount  from recurringPayments join accounts on recurringPayments.payerAccount = accounts.id join users on accounts.userId = users.id where recurringpayments.activeStatus = "active" and userId = ?',
+      { replacements: [userId] }
+    )
+    .then((response) => {res.json(response)}).catch((error) => {
+      res.status(404).json("Could not find any recurring payments");
+    });
+});
+
+/**
  * return active recurring payments by account - not user
  */
 router.get(
@@ -184,30 +198,38 @@ router.get(
 
 /**
  * post here when a user creates a transaction - requesting payment, transferring funds, paying fees
- * 
- * if a paying fees transaction -- add payingFees: true and accountWithFees: accountId to req body 
+ *
+ * if a paying fees transaction -- add payingFees: true and accountWithFees: accountId to req body
  *
  * params: logged in user, target account id, origin account id, value (in origin account currency)
  */
 
 router.post("/transferFunds", validateToken, async (req, res) => {
   const userId = req.userId;
-  let { payerAccountId, payeeAccountId, originValue, payingFees, accountWithFees } = req.body;
+  let {
+    payerAccountId,
+    payeeAccountId,
+    originValue,
+    payingFees,
+    accountWithFees,
+  } = req.body;
   if (payerAccountId == payeeAccountId) {
     return res.status(400).json("Cannot transfer funds to same account");
   }
 
   let accountCarryingFees;
   //this needs to be the admin account!!!
-  if(payingFees === true){
+  if (payingFees === true) {
     payeeAccountId = 0;
-    if(payerAccountId === accountWithFees){
-      return res.status(400).json("Cannot pay fess on account with that account");
+    if (payerAccountId == accountWithFees) {
+      return res
+        .status(400)
+        .json("Cannot pay fess on account with that account");
     }
   }
 
   const originAccount = await Accounts.findOne({
-    where: { id: payerAccountId, userId: userId},
+    where: { id: payerAccountId, userId: userId },
   });
   const targetAccount = await Accounts.findByPk(payeeAccountId);
 
@@ -220,13 +242,12 @@ router.post("/transferFunds", validateToken, async (req, res) => {
     return res.status(403).json("Cannot transfer funds with this account");
   }
 
-
-  if(payingFees === true){
-     accountCarryingFees = await Accounts.findByPk(accountWithFees);
-     if(accountCarryingFees.userId !== originAccount.userId){
-       return res.status(403).json("You cannot pay the fees on that account");
-     }
-    if(accountCarryingFees.latePaymentFees < originValue){
+  if (payingFees === true) {
+    accountCarryingFees = await Accounts.findByPk(accountWithFees);
+    if (accountCarryingFees.userId !== originAccount.userId) {
+      return res.status(403).json("You cannot pay the fees on that account");
+    }
+    if (accountCarryingFees.latePaymentFees < originValue) {
       return res.status(400).json("Cannot over pay late fees.");
     }
   }
@@ -292,11 +313,14 @@ router.post("/transferFunds", validateToken, async (req, res) => {
         : Number(targetAccount.balance) + transactionResult.targetValue,
   };
 
-  if(targetAccount.accountType === "credit" && targetAccount.minimumPayment > 0){
+  if (
+    targetAccount.accountType === "credit" &&
+    targetAccount.minimumPayment > 0
+  ) {
     targetAccount.minimumPayment = targetAccount.minimumPayment - targetValue;
-    if(targetAccount.minimumPayment < 0){
+    if (targetAccount.minimumPayment < 0) {
       payeeUpdate.minimumPayment = 0;
-    }else{
+    } else {
       payeeUpdate.minimumPayment = minimumPayment;
     }
   }
@@ -320,15 +344,20 @@ router.post("/transferFunds", validateToken, async (req, res) => {
     where: { id: transactionResult.id },
   });
 
-  if(payingFees === true){
+  if (payingFees === true) {
     const latePaymentFees = accountCarryingFees.latePaymentFees - targetValue;
-    console.log(latePaymentFees)
-    Accounts.update({latePaymentFees: latePaymentFees}, {where: {id: accountWithFees}}).then((result) => {
+    console.log(latePaymentFees);
+    Accounts.update(
+      { latePaymentFees: latePaymentFees },
+      { where: { id: accountWithFees } }
+    ).then((result) => {
       console.log(result);
     });
-    return res.json("paid fees");
+    return res.json("Fees have been paid");
+  }else{
+    return res.json("Transferred successfully");
   }
-  return res.json("Transferred successfully");
+  
 });
 
 /**
@@ -393,26 +422,29 @@ router.post("/depositCheque", validateToken, async (req, res) => {
       }
       try {
         const path = files.file[0].path;
-        if(!path) reject("No file uploaded");
+        if (!path) reject("No file uploaded");
         const body = { path: path, fields: fields };
         resolve(body);
       } catch (err) {
         reject(err);
       }
     });
-  }).then((result) => {
-    request = result;
-    console.log(result);
-  }).catch((err) => {
-    console.log(err);
-  });
+  })
+    .then((result) => {
+      request = result;
+      console.log(result);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
-  if(!request){
+  if (!request) {
     return res.status(400).json("Bad request");
   }
   const uploadResult = await uploadCheque(request.path);
-  const { payeeAccountId, payerAccountId, value, chequeNumber } = request.fields;
-  
+  const { payeeAccountId, payerAccountId, value, chequeNumber } =
+    request.fields;
+
   // const tempData = {
   //   payeeAccountId: 3,
   //   payerAccountId: 2,
@@ -441,7 +473,7 @@ router.post("/depositCheque", validateToken, async (req, res) => {
     where: { payerAccount: payerAccountId, chequeNumber: chequeNumber },
   });
   if (duplicateCheques.length > 0) {
-      return res.status(400).json("That check has already been deposited");
+    return res.status(400).json("That check has already been deposited");
   }
 
   const chequeData = {
@@ -453,9 +485,7 @@ router.post("/depositCheque", validateToken, async (req, res) => {
     chequeNumber: chequeNumber,
   };
   let chequeId;
-  await Cheques.create(chequeData).then(
-    (response) => (chequeId = response.id)
-  );
+  await Cheques.create(chequeData).then((response) => (chequeId = response.id));
   const targetValue = await exchangeCurrency(
     originAccount.currency,
     targetAccount.currency,
@@ -484,7 +514,6 @@ router.post("/depositCheque", validateToken, async (req, res) => {
     .catch((error) => {
       return res.status(400).json(error);
     });
-    
 });
 
 /**
