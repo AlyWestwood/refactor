@@ -85,7 +85,6 @@ router.post("/recurringPayments", validateToken, async (req, res) => {
   if (
     !payerAccount ||
     !payeeAccount ||
-    payerAccount.userId === payeeAccount.userId ||
     payerAccountId === payeeAccountId ||
     payerAccount.activeStatus !== "active" ||
     payeeAccount.activeStatus !== "active"
