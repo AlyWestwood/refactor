@@ -2,13 +2,17 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, Button, Row, Col } from "react-bootstrap";
 import { reqHeader } from "../../misc/reqHeader";
-import { Formik, Field, ErrorMessage, Form } from "formik";
+import { Formik, Field, ErrorMessage, Form, useFormikContext } from "formik";
 import * as Yup from "yup";
 
-function NewTransfer() {
+function PayFees() {
   const [accountList, setAccountList] = useState([]);
+  const [feesAccounts, setFeesAccounts] = useState([]);
   const [alert, setAlert] = useState("");
   const [success, setSuccess] = useState("");
+  const [fees, setFees] = useState("0.00");
+  const [feesMap, setFeesMap] = useState([]);
+
   useEffect(() => {
     axios
       .get("/accounts/totals", reqHeader)
@@ -17,12 +21,33 @@ function NewTransfer() {
         initialValues.payerAccountId = result.data.accountTotals[0].accountId;
       })
       .catch((err) => console.log(err.response.data));
-  }, []);
+
+    axios
+      .get("/accounts/withFees", reqHeader)
+      .then((result) => {
+        console.log(result.data);
+        setFeesAccounts(result.data);
+        initialValues.accountWithFees = result.data[0].id;
+        setFees(result.data[0].latePaymentFees);
+        console.log(initialValues.accountWithFees);
+
+        let feesArray = [];
+        for (let i = 0; i < result.data.length; i++) {
+          feesArray[result.data[i].id] = result.data[i].latePaymentFees;
+        }
+        setFeesMap(feesArray);
+        console.log(feesArray)
+      })
+      .catch((error) => {
+        console.log(error.response);
+      });
+  }, [success]);
 
   const initialValues = {
     payerAccountId: "",
-    payeeAccountId: "",
+    accountWithFees: "",
     originValue: "",
+    payingFees: true,
   };
 
   const onSubmit = (data, { resetForm }) => {
@@ -33,7 +58,8 @@ function NewTransfer() {
       .post("/transactions/transferFunds", data, reqHeader)
       .then((response) => {
         console.log(response);
-        setSuccess("Transfered Successfully");
+        setSuccess(response.data);
+        setFees("--");
         resetForm();
       })
       .catch((error) => {
@@ -46,15 +72,15 @@ function NewTransfer() {
     payerAccountId: Yup.number().required(
       "The account the payment will be withdrawn from is required."
     ),
-    payeeAccountId: Yup.string().required(
-      "The account that will receive the deposit is required."
+    accountWithFees: Yup.number().required(
+      "The account that with fees owing is required."
     ),
-    originValue: Yup.number().min(1, "The minimum payment amount is $1").required("The payment value is required."),
+    originValue: Yup.number().required("The payment value is required."),
   });
 
   return (
     <Card className="col-7">
-      <Card.Header>Transfer Funds</Card.Header>
+      <Card.Header>Pay Late Payment Fees</Card.Header>
       {alert && (
         <div className="alert alert-danger" role="alert">
           {alert}
@@ -71,7 +97,13 @@ function NewTransfer() {
           onSubmit={onSubmit}
           validationSchema={validationSchema}
         >
-          <Form>
+          <Form
+            onChange={(nextValues) => {
+              if (nextValues.target.name === "accountWithFees") {
+                setFees(feesMap[nextValues.target.value]);
+              }
+            }}
+          >
             <Row>
               <Col>
                 <div className="form-group">
@@ -102,24 +134,42 @@ function NewTransfer() {
               </Col>
               <Col>
                 <div className="form-group">
-                  <label className="form-label">Pay To</label>
+                  <label className="form-label">Account with fees to pay</label>
                   <Field
-                    className="form-control"
-                    type="number"
-                    name="payeeAccountId"
-                    placeholder="Account Number"
-                    min="1"
-                  />
+                    as="select"
+                    className="form-select"
+                    name="accountWithFees"
+                  >
+                    {feesAccounts.map((feesAccount) => {
+                      return (
+                        <option
+                          key={feesAccount.accountId}
+                          value={feesAccount.id}
+                        >
+                          Account #{feesAccount.id} - {feesAccount.currency}{" "}
+                          {feesAccount.accountType}
+                        </option>
+                      );
+                    })}
+                  </Field>
                 </div>
                 <ErrorMessage
                   className="text-danger"
-                  name="payeeAccountId"
+                  name="accountWithFees"
                   component="span"
                 />
               </Col>
             </Row>
             <Row>
-              <Col xs={6}>
+              <Col>
+                <div className="form-group">
+                  <label className="form-label">Late Payment Fees</label>
+                </div>
+                <div className="form-control " disabled>
+                  {fees}
+                </div>
+              </Col>
+              <Col>
                 <div className="form-group">
                   <label className="form-label">Value</label>
                   <Field
@@ -146,4 +196,4 @@ function NewTransfer() {
   );
 }
 
-export default NewTransfer;
+export default PayFees;

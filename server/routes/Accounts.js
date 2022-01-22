@@ -4,7 +4,7 @@ const { Users } = require("../models");
 const { Accounts } = require("../models");
 const { validateToken, validateAdminToken } = require("../misc/authware");
 const { exchangeCurrency } = require("../utils/utils");
-
+const Op = require("Sequelize").Op;
 /**
  * Returns the logged in user's accounts
  */
@@ -16,6 +16,17 @@ router.get("/getAccounts", validateToken, async (req, res) => {
 
   res.json({ listOfAccounts: listOfAccounts });
 });
+
+/**
+ * return the accounts that have fees
+ */
+router.get("/withFees", validateToken, async (req, res) => {
+  const userId = req.userId;
+  const accountsWithFees = await Accounts.findAll({where: {userId: userId, latePaymentFees: {[Op.gt]: 0}}});
+
+  res.json(accountsWithFees);
+})
+
 
 /**
  * returns the totals of all accounts in different currencies and the cad equivalent 
@@ -177,10 +188,6 @@ router.post("/closeAccount", validateToken, async (req, res) => {
       return res.json(error);
     });
 });
-
-router.get("/payCreditFees", validateToken, (req, res) => {
-  
-})
 
 function validateAccountApplication(user, requestBody) {
   const { currency, accountType } = requestBody;
