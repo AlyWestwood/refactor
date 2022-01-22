@@ -1,21 +1,17 @@
-import React, { useState,  useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, Button, Row, Col } from "react-bootstrap";
-// import { reqHeader } from "../../misc/reqHeader";
+import { reqHeader } from "../../misc/reqHeader";
 import { Formik, Field, ErrorMessage, Form } from "formik";
 import * as Yup from "yup";
 
-function NewRecurringPayment() {
+function NewTransfer() {
   const [accountList, setAccountList] = useState([]);
   const [alert, setAlert] = useState("");
   const [success, setSuccess] = useState("");
   useEffect(() => {
     axios
-      .get("/accounts/totals", {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
+      .get("/accounts/totals", reqHeader)
       .then((result) => {
         setAccountList(result.data.accountTotals);
         initialValues.payerAccountId = result.data.accountTotals[0].accountId;
@@ -26,23 +22,18 @@ function NewRecurringPayment() {
   const initialValues = {
     payerAccountId: "",
     payeeAccountId: "",
-    interval: "",
     originValue: "",
-    startDate: "",
   };
 
-  const onSubmit = (data, {resetForm}) => {
+  const onSubmit = (data, { resetForm }) => {
     setAlert("");
     setSuccess("");
+    console.log(data);
     axios
-      .post("/transactions/recurringPayments", data, {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
+      .post("/transactions/transferFunds", data, reqHeader)
       .then((response) => {
         console.log(response);
-        setSuccess("Recurring payment created successfully");
+        setSuccess("Transfered Successfully");
         resetForm();
       })
       .catch((error) => {
@@ -55,19 +46,15 @@ function NewRecurringPayment() {
     payerAccountId: Yup.number().required(
       "The account the payment will be withdrawn from is required."
     ),
-    interval: Yup.number().required("Must have interval"),
     payeeAccountId: Yup.string().required(
       "The account that will receive the deposit is required."
     ),
     originValue: Yup.number().required("The payment value is required."),
-    startDate: Yup.date().required(
-      "The date of the first payment is required."
-    ),
   });
 
   return (
     <Card className="col-7">
-      <Card.Header>Set up a recurring payment</Card.Header>
+      <Card.Header>Transfer Funds</Card.Header>
       {alert && (
         <div className="alert alert-danger" role="alert">
           {alert}
@@ -83,7 +70,6 @@ function NewRecurringPayment() {
           initialValues={initialValues}
           onSubmit={onSubmit}
           validationSchema={validationSchema}
-          // validator={() => ({})}
         >
           <Form>
             <Row>
@@ -133,14 +119,14 @@ function NewRecurringPayment() {
               </Col>
             </Row>
             <Row>
-              <Col>
+              <Col xs={6}>
                 <div className="form-group">
                   <label className="form-label">Value</label>
                   <Field
                     className="form-control"
                     type="number"
                     name="originValue"
-                    placeholder="Amount to be withdrawn in the currency of the original account"
+                    placeholder="Amount to be withdrawn"
                     min="1"
                     step=".01"
                   />
@@ -151,42 +137,8 @@ function NewRecurringPayment() {
                   component="span"
                 />
               </Col>
-              <Col>
-                <div className="form-group">
-                  <label className="form-label">Repeating Interval</label>
-                  <Field
-                    className="form-control"
-                    type="number"
-                    name="interval"
-                    placeholder="Number of days between payments"
-                    min="1"
-                  />
-                </div>
-                <ErrorMessage
-                  className="text-danger"
-                  name="interval"
-                  component="span"
-                />
-              </Col>
             </Row>
-            <Row>
-              <Col>
-                <div className="form-group">
-                  <label className="form-label">Payment start date</label>
-                  <Field
-                    className="form-control"
-                    type="date"
-                    name="startDate"
-                  />
-                </div>
-                <ErrorMessage
-                  className="text-danger"
-                  name="startDate"
-                  component="span"
-                />
-              </Col>
-            </Row>
-            <Button type="submit">Create recurring payment</Button>
+            <Button type="submit">Make Transfer</Button>
           </Form>
         </Formik>
       </Card.Body>
@@ -194,4 +146,4 @@ function NewRecurringPayment() {
   );
 }
 
-export default NewRecurringPayment;
+export default NewTransfer;

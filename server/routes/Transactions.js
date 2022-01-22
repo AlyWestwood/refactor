@@ -193,7 +193,7 @@ router.get(
 router.post("/transferFunds", validateToken, async (req, res) => {
   const userId = req.userId;
   let { payerAccountId, payeeAccountId, originValue, payingFees, accountWithFees } = req.body;
-  if (payerAccountId === payeeAccountId) {
+  if (payerAccountId == payeeAccountId) {
     return res.status(400).json("Cannot transfer funds to same account");
   }
 

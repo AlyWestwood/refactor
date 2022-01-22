@@ -26,6 +26,7 @@
   import PayBills from './pages/client/PayBills';
   import Transactions from './pages/client/Transactions';
   import TransferC from './pages/client/Transfer';
+  import NewTransfer from './pages/client/NewTransfer';
   import RecurringPayment from './pages/client/RecurringPayment';
   import NewRecurringPayment from './pages/client/NewRecurringPayment';
 
@@ -72,8 +73,9 @@ function App() {
                 <Route path="recurringpayment" element={<RecurringPayment/>}/>
                 <Route path="newrecurringpayment" element={<NewRecurringPayment/>}/>
                 <Route path="paybills" element={<PayBills/>}/>
+                <Route path="transfer" element={<NewTransfer/>}/>
                 {/* <Route path="transactions" element={<Transactions/>}/> */}
-                <Route path="transfer" element={<TransferC/>}/>
+                 {/* <Route path="transfer" element={<TransferC/>}/> */}
             </Route>
 
         {/* admin routes */}
