@@ -7,7 +7,8 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Card, Col, ListGroup, Nav } from 'react-bootstrap';
 import axios from 'axios';
 import { reqHeader } from '../../misc/reqHeader';
-import DisplayAccount from '../../components/DisplayAccount';
+import DisplayAccounts from '../../components/DisplayAccounts';
+import InactiveAccount from '../../components/InactiveAccount';
 
 function Accounts() {
     const [accountList, setAccountList] = useState([]);
@@ -53,18 +54,19 @@ function Accounts() {
         <h1 className='text-start'>Accounts Overview</h1>
         <Col lg={9}>
             {accountList.map(account => {
+                if(account.activeStatus === 'inactive'){
+                    return <InactiveAccount key={'account' + account.id} account ={account} />
+                }
                 return (
-                    <div onClick={() => navigate(`/client/accounts/${account.id}`)}>
-                    <DisplayAccount key={"account" + account.id} value = {account} />
-                    </div>
+                    <DisplayAccounts key={"account" + account.id} account = {account} />
                 )
             })}
   
         </Col>
         <Col>
             <Card className='m-3 sticky-top text-end'>
-                <Card.Header>
-                    words
+                <Card.Header className='h5'>
+                    Totals
                 </Card.Header>
                 <Card.Body>
                     <Card.Title>

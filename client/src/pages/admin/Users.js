@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { reqHeader } from '../../misc/reqHeader';
 import { Card, ListGroup, Row, Col, Modal, Button } from 'react-bootstrap';
-import { parseDate } from '../../misc/parseDate';
+import { parseDate } from '../../misc/accountUtils';
 import { Navigate, useNavigate } from 'react-router-dom';
 
 
@@ -33,19 +33,20 @@ function Users() {
     function activateUser(user){
         axios.put('/admin/enableUser', {userId: user.id}, reqHeader)
         .then(res => {
-            var newList = userList.filter(aUser => {return aUser.id !== user.id})
-            user.activeStatus = 'active';
-            setUserList([...newList, user]);
+            var newList = userList;
+            newList[newList.indexOf(user)].activeStatus = 'active';
+            setUserList(newList);
             setShowModal(false);
         })
         .catch(err => console.log(err))
     }
+
     function disableUser(user){
         axios.post('/admin/disableUser', {userId: user.id}, reqHeader)
         .then(res => {
-            var newList = userList.filter(aUser => {return aUser.id !== user.id})
-            user.activeStatus = 'disabled';
-            setUserList([...newList, user]);
+            var newList = userList;
+            newList[newList.indexOf(user)].activeStatus = 'disabled';
+            setUserList(newList);
             setShowModal(false);
         })
         .catch(err => console.log(err))
@@ -62,7 +63,7 @@ function Users() {
                 <Col>Status</Col>
                 <Col>Role</Col>
             </Row>
-</Card.Header>
+        </Card.Header>
         <ListGroup>
             {userList.map(user => {
                 return(
