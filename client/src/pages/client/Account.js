@@ -19,12 +19,12 @@ function Account() {
     return (
         <>
         <Col md={9}>
-            <DisplayAccount key={account.id} value={account}/>
+            <DisplayAccount key={account.id} account={account}/>
         </Col>
         <Col>
             <Card className='m-3 sticky-top text-end'>
-                <Card.Header>
-                    words
+                <Card.Header className='h5'>
+                    Tools
                 </Card.Header>
                 <Card.Body>
                     <Card.Text>

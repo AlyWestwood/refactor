@@ -33,7 +33,6 @@
   import NewAccountA from './pages/admin/NewAccount';
   import TransferA from './pages/admin/Transfer';
   import Users from './pages/admin/Users';
-  import User from './pages/admin/User';
 
 /* IMPORTS END */
 
@@ -80,9 +79,7 @@ function App() {
             <Route path="accounts" element={<AdminAccounts/>}/>
             {/* <Route path="openAccount" element={<NewAccountA/>}/> */}
             <Route path="transfer" element={<TransferA/>}/>
-            <Route path="users" element={<Users/>}>
-              <Route path=":userId" element={<User/>}/>
-            </Route>
+            <Route path="users" element={<Users/>}/>
           </Route>
         </Route>
 
