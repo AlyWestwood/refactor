@@ -79,6 +79,10 @@ router.post("/recurringPayments", validateToken, async (req, res) => {
   });
   const payeeAccount = await Accounts.findByPk(payeeAccountId);
 
+  if(originValue < 1){
+    return res.status(400).json("Cannot have a negative value");
+  }
+
   if (
     !payerAccount ||
     !payeeAccount ||
