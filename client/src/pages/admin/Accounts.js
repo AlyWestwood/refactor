@@ -13,7 +13,7 @@ function Accounts() {
   const [showForm, setShowForm] = useState(false);
   const [userTotals, setUserTotals] = useState({});
   const [formAccount, setFormAccount] = useState({});
-  const [form, setForm] = useState({creditLimit: 1000, interestRate: 0.19, accountId: 0});
+  const [form, setForm] = useState({creditLimit: 1000, interestRate: 0.19, accountId: 0, activeStatus: ''});
   const [success, setSuccess] = useState("");
   const [alert, setAlert] = useState("");
 
@@ -42,7 +42,8 @@ function Accounts() {
     })
   }
   
-  function approveAccount(e){
+  function processAccount(status){
+    form.status = status;
     console.log(form);
     axios.put('/admin/approveCreditAccounts', form, reqHeader)
     .then(res => {
@@ -84,7 +85,7 @@ function Accounts() {
               <tbody>
           {accounts.map(account => {
             return(
-                <tr onClick={() => getApprovalForm(account)}>
+                <tr onClick={() => getApprovalForm(account)} key={'application' + account.id}>
                   <td>{account.userId}</td>
                   <td>{parseDateTime(account.createdAt)}</td>
                   <td>{account.currency}</td>
@@ -122,7 +123,7 @@ function Accounts() {
                         <tbody>
                         { userTotals.accountTotals && userTotals.accountTotals.map(account => {
                           return (
-                            <tr>
+                            <tr key={'account' + account.id}>
                               <td>{account.currency} - {account.accountType}</td>
                               <td>{getSymbol(account.currency)}{account.availableBalance}</td>
                               
@@ -149,10 +150,13 @@ function Accounts() {
                 <Row className='mb-3 text-center'>
                   <Col>
                     <Button className='m-2' onClick={e => {
-                      approveAccount(e);
-                      closeForm()
+                      processAccount('active');
+                      closeForm();
                       }}>Approve</Button>
-                    <Button variant='danger' className='m-2'>Reject</Button>
+                    <Button variant='danger' className='m-2' onClick={e =>{
+                      processAccount('disabled');
+                      closeForm();
+                    }}>Reject</Button>
                   </Col>
                 </Row>
               </Form>
