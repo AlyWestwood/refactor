@@ -13,7 +13,7 @@ function Accounts() {
   const [showForm, setShowForm] = useState(false);
   const [userTotals, setUserTotals] = useState({});
   const [formAccount, setFormAccount] = useState({});
-  const [form, setForm] = useState({creditLimit: 1000, interestRate: 0.19, accountId: 0, activeStatus: ''});
+  const [form, setForm] = useState({creditLimit: 1000, interestRate: 19, accountId: 0, activeStatus: ''});
   const [success, setSuccess] = useState("");
   const [alert, setAlert] = useState("");
 
