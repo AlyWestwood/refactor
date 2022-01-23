@@ -1,7 +1,7 @@
 import React, {useContext} from 'react'
 // import {Link, NavLink} from 'react-router-dom';
 import { AuthContext } from '../misc/AuthContext';
-import {Navbar, Nav} from 'react-bootstrap';
+import {Navbar, Nav, NavDropdown} from 'react-bootstrap';
 
 /* PIMARY HEADER */
 
@@ -27,10 +27,12 @@ function Client(){
     return (
         <>
         <Nav.Link href="/client/accounts">Accounts</Nav.Link>
-        <Nav.Link href="/client/chequedeposit">Deposit</Nav.Link>
-        <Nav.Link href="/client/transfer">Transfer funds</Nav.Link>
-        <Nav.Link href="/client/newrecurringpayment">Create Recurring Payment</Nav.Link>
-        <Nav.Link href="/client/payfees">Pay Credit Fees</Nav.Link>
+        <Nav.Link href="/client/recurringpayment">Recurring Payments</Nav.Link>
+        <NavDropdown title='Banking' menuVariant='dark'>
+            <NavDropdown.Item href="/client/chequedeposit">Deposit</NavDropdown.Item>
+            <NavDropdown.Item href="/client/transfer">Transfer funds</NavDropdown.Item>
+            <NavDropdown.Item href="/client/payfees">Pay Credit Fees</NavDropdown.Item>
+        </NavDropdown>
         </>
     )
 }
