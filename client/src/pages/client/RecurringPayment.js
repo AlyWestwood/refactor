@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import { Card, ListGroup, Row, Col, Table, Button, Modal } from 'react-bootstrap';
+import { Card, ListGroup, Row, Col, Table, Button, Modal, Nav } from 'react-bootstrap';
 import axios from 'axios';
 import { reqHeader } from '../../misc/reqHeader';
 import { AuthContext } from '../../misc/AuthContext';
@@ -47,8 +47,15 @@ function RecurringPayment() {
 
     return (
         <>
+        <Nav variant='tabs' className='justify-content-end text-start' >
+          <Nav.Item>
+              <Nav.Link href={`/client/newrecurringpayment/${byAccount ? params.accountId : ''}`}>Add New</Nav.Link>
+          </Nav.Item>
+        </Nav>
+
+        <h1>Recurring Payments</h1>
         <Card>
-            <Card.Header>Header</Card.Header>
+            <Card.Header>{byAccount && 'Account # ' + params.accountId}&nbsp;</Card.Header>
             <Card.Body>
                 {flashMessage &&
                 <Card.Text>{flashMessage}</Card.Text>}
@@ -80,16 +87,18 @@ function RecurringPayment() {
 
         <Modal
             id = {'deletePayment' + showDelete}
-            size = 'sm'
+            size = 'md'
             show = { showDelete !== false }
             onHide = {() => setShowDelete(false)}
             className = 'text-center'
             centered
         >
-            <Modal.Header closeButton closeVariant='white' className='bg-secondary text-light'/>
+            <Modal.Header closeButton closeVariant='white' className='bg-secondary text-light h5'>Delete</Modal.Header>
             <Modal.Body>
                 <Row className='mb-3'>
-                    Are you sure you want to delete this recurring payment?
+                    <Col className='text-center'>
+                        Are you sure you want to delete this recurring payment?
+                    </Col>
                 </Row>
                 <Button variant='danger' onClick={() => deletePayment(showDelete)}>Yes, delete it</Button>
             </Modal.Body>

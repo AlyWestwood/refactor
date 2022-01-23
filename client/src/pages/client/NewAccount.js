@@ -1,15 +1,18 @@
 /**
  * Open a new banking account
  */
-import React from 'react';
-import { Card, Form, Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Card, Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { reqHeader } from '../../misc/reqHeader';
 
 function NewAccount() {
-
+    const [alert, setAlert] = useState("");
+    const [success, setSuccess] = useState("");
+  
 const navigate = useNavigate();
+
     const createAccount = submit => {
         submit.preventDefault();
         var account = {
@@ -18,10 +21,10 @@ const navigate = useNavigate();
         }
         console.log(account);
         axios.post('/accounts/createAccount', account, reqHeader).then(res => {
-            alert(res.data.message);
-            navigate('/');
+            setSuccess(res.data.message);
+            submit.target.reset();
         }).catch(err => {
-            alert(err.response.data.error)
+            setAlert(err.response ? err.response.data.error : 'There was an error processing your request')
         });
     }
 
@@ -30,6 +33,16 @@ const navigate = useNavigate();
         <Card className='col-5 m-3'>
             <Card.Header >Create a New Account</Card.Header>
             <Card.Body>
+            {alert && (
+                <Alert variant='danger' onClose={() => setAlert("")} dismissible>
+                {alert}
+                </Alert>
+            )}
+            {success && (
+                <Alert variant='success' onClose={() => setSuccess("")} dismissible>
+                {success}
+                </Alert>
+            )}
                 <Form onSubmit={createAccount}>
                     <Form.Group className='mb-3' controlId='type'>
                         <Form.Label>Account Type</Form.Label>

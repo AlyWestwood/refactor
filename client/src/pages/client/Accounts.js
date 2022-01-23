@@ -56,9 +56,10 @@ function Accounts() {
                 if(account.activeStatus === 'inactive'){
                     return <InactiveAccount key={'account' + account.id} account ={account} />
                 }
-                return (
-                    <DisplayAccounts key={"account" + account.id} account = {account} />
-                )
+                if(account.activeStatus === 'active'){
+                    return <DisplayAccounts key={"account" + account.id} account = {account} />
+                }
+                return <></>
             })}
   
         </Col>
