@@ -40,6 +40,7 @@ function Admin(){
         <>
         <Nav.Link href="/admin/accounts">Accounts</Nav.Link>
         <Nav.Link href="/admin/users">Users</Nav.Link>
+        <Nav.Link href="/admin/approvecheques">Approve Cheques</Nav.Link>
         </>
     )
 }

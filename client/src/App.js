@@ -36,6 +36,7 @@
   import NewAccountA from './pages/admin/NewAccount';
   import TransferA from './pages/admin/Transfer';
   import Users from './pages/admin/Users';
+  import ApproveCheques from './pages/admin/ApproveCheques';
 
 /* IMPORTS END */
 
@@ -86,6 +87,7 @@ function App() {
             {/* <Route path="openAccount" element={<NewAccountA/>}/> */}
             <Route path="transfer" element={<TransferA/>}/>
             <Route path="users" element={<Users/>}/>
+            <Route path="approvecheques" element={<ApproveCheques />}/>
           </Route>
         </Route>
 

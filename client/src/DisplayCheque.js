@@ -1,9 +1,8 @@
-import React, { useState, useContext, useEffect } from "react";
-import axios from "axios";
+import React, { useState,} from "react";
 
 function DisplayCheque() {
-  const [chequeId, setChequeId]  = useState(1);
-  const [token, setToken] = useState(localStorage.getItem("access-token"));
+  const [chequeId]  = useState(1);
+  const [token] = useState(localStorage.getItem("access-token"));
 
 // useEffect(() => {
 //     axios.get("/transactions/cheques/1", {
@@ -18,7 +17,7 @@ function DisplayCheque() {
 
   return (
     <div>
-      <img src={`http://localhost:3001/admin/chequeImage/${chequeId}/${token}`}></img>
+      <img src={`http://localhost:3001/admin/chequeImage/${chequeId}/${token}`} width="400px"></img>
       <img src={`http://localhost:3001/transactions/cheques/${chequeId}/${token}`}></img>
     </div>
   );
