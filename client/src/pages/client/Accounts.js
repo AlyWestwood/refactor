@@ -3,7 +3,7 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Card, Col, ListGroup, Nav } from 'react-bootstrap';
 import axios from 'axios';
 import { reqHeader } from '../../misc/reqHeader';
@@ -14,7 +14,6 @@ function Accounts() {
     const [accountList, setAccountList] = useState([]);
     const [totals, setTotals] = useState(null);
     const location = useLocation();
-    const navigate = useNavigate();
 
     useEffect(() => {
         axios.get('/accounts/getAccounts', reqHeader)

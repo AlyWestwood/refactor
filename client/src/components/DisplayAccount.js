@@ -3,7 +3,6 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Card, ListGroup, Row, Col, Modal, Table, Button } from 'react-bootstrap';
 import { reqHeader } from '../misc/reqHeader';
@@ -12,7 +11,6 @@ import { assignTransaction, getSymbol, parseDateTime } from '../misc/accountUtil
 function DisplayAccount({account}){
     const [transactionList, setTransactionList] = useState([]);
     const [showModal, setShowModal] = useState([]);
-    const navigate = useNavigate();
     const [paginate, setPaginate] = useState("");
     const [page, setPage] = useState(0);
     

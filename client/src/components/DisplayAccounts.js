@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Card, ListGroup, Row, Col, Button } from 'react-bootstrap';
+import { Card, ListGroup, Row, Col } from 'react-bootstrap';
 import { reqHeader } from '../misc/reqHeader';
 import { assignTransaction, getSymbol } from '../misc/accountUtils';
 
