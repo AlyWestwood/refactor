@@ -2,9 +2,11 @@ Aly
     react-bootstrap
     contexts
     scss
+    
 
 Kate 
     promises
     s3
     displaying s3 image without base 64
     keeping the transactions synchronous
+    pagination

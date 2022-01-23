@@ -167,3 +167,35 @@ Aly
 - transfers
 3. Where do I need assistance? What do I need to figure out?
 - time management
+
+23 Jan 2022
+Kate
+1. What I have done / not done since last Scrum?
+-users can pay of fees
+-admins can approve cheques
+- cheque deposit form
+-pagination on cheques
+-clients transfer form
+-recurring payments form
+2. What I plan to do from this scrum to next? (next 24 hours)
+- tweak recurring payments backend
+- users can close accounts
+- pagination on other pages
+- look into hosting - heroku
+3. Where do I need assistance? What do I need to figure out?
+
+Aly
+1. What I have done / not done since last Scrum?
+- finished transaction details implementation
+- started admin approval of credit accounts
+- started recurring payments view
+
+2. What I plan to do from this scrum to next? (next 24 hours)
+- finish recurring payments page
+- finish credit account approval page
+- users view of cheques
+- flash messages!
+- home page
+- look into hosting - s3
+3. Where do I need assistance? What do I need to figure out?
+- focus
