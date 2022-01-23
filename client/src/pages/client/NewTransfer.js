@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from 'react-router-dom';
 import axios from "axios";
 import { Card, Button, Row, Col } from "react-bootstrap";
 import { reqHeader } from "../../misc/reqHeader";
@@ -9,21 +10,29 @@ function NewTransfer() {
   const [accountList, setAccountList] = useState([]);
   const [alert, setAlert] = useState("");
   const [success, setSuccess] = useState("");
+  const params = useParams();
+  
   useEffect(() => {
     axios
       .get("/accounts/totals", reqHeader)
       .then((result) => {
-        setAccountList(result.data.accountTotals);
-        initialValues.payerAccountId = result.data.accountTotals[0].accountId;
-      })
+        if(!params.accountId){
+          setAccountList(result.data.accountTotals);
+          initialValues.payerAccountId = result.data.accountTotals[0].accountId;
+        } else {
+          setAccountList(result.data.accountTotals.filter(account => parseInt(account.accountId) === parseInt(params.accountId)))
+        }
+        })
       .catch((err) => console.log(err.response.data));
-  }, []);
+  }, [params]);
 
   const initialValues = {
-    payerAccountId: "",
+    payerAccountId: params.accountId ? params.accountId : "",
     payeeAccountId: "",
     originValue: "",
   };
+
+
 
   const onSubmit = (data, { resetForm }) => {
     setAlert("");
@@ -72,7 +81,7 @@ function NewTransfer() {
           validationSchema={validationSchema}
         >
           <Form>
-            <Row>
+            <Row className='mb-3'>
               <Col>
                 <div className="form-group">
                   <label className="form-label">From Account</label>
@@ -118,7 +127,7 @@ function NewTransfer() {
                 />
               </Col>
             </Row>
-            <Row>
+            <Row className='mb-3'>
               <Col xs={6}>
                 <div className="form-group">
                   <label className="form-label">Value</label>

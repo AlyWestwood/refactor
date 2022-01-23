@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { reqHeader } from '../../misc/reqHeader';
 import { Card, ListGroup, Row, Col, Modal, Button } from 'react-bootstrap';
-import { parseDate } from '../../misc/accountUtils';
+import { parseDateTime } from '../../misc/accountUtils';
 import { Navigate, useNavigate } from 'react-router-dom';
 
 
@@ -116,7 +116,7 @@ function Users() {
                     </Row>
                     <Row>
                         <Col>Registration date</Col>
-                        <Col>{parseDate(user.createdAt)}</Col>
+                        <Col>{parseDateTime(user.createdAt)}</Col>
                     </Row>
                 </Modal.Body>
                 <Modal.Footer>

@@ -16,6 +16,12 @@ function Account() {
         .catch(err => alert(err.response.data.error))
     }, [params.accountId]);
 
+    if(account.activeStatus !== 'active'){
+        return (
+            account.activeStatus === 'inactive' ? <div>This account has not yet been approved</div> : <div>This account does not exist</div>
+        )
+    }
+
     return (
         <>
         <Col md={9}>
@@ -26,15 +32,20 @@ function Account() {
                 <Card.Header className='h5'>
                     Tools
                 </Card.Header>
-                <Card.Body>
+                {/* <Card.Body>
                     <Card.Text>
                         Grand total assets
                     </Card.Text>
-                </Card.Body>
+                </Card.Body> */}
                 <ListGroup>
-                    <ListGroup.Item>Total debit:</ListGroup.Item>
+                    <ListGroup.Item>
+                        <Link to={`/client/transfer/${account.id}`}>Transfer Funds</Link>
+                    </ListGroup.Item>
                     <ListGroup.Item>
                         <Link to={`/client/chequedeposit/${account.id}`}>Deposit a cheque</Link>
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                        <Link to={`/client/newrecurringpayment/${account.id}`}>Set up a recurring payment</Link>
                     </ListGroup.Item>
                 </ListGroup>
             </Card>        
