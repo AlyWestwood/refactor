@@ -110,12 +110,14 @@ function ApproveCheques() {
         .then((result) => {
           console.log(result);
           setSuccess(result.data);
-          setTimeout(setSuccess(""), 10000);
+          const timeout = setTimeout(() => setSuccess(""), 10000);
+          setShowModal("");
         })
         .catch((error) => {
           setAlert(error.response.data);
           console.log(error.response.data);
-          setTimeout(setAlert(""), 10000);
+          const timeout = setTimeout(() => setAlert(""), 10000);
+          setShowModal("");
         });
       setApprove("");
     }
@@ -127,26 +129,31 @@ function ApproveCheques() {
         .then((result) => {
           console.log(result);
           setSuccess(result.data);
-          setTimeout(setSuccess(""), 10000);
+          const timeout = setTimeout(() => setSuccess(""), 10000);
+          setShowModal("");
+          
         })
         .catch((error) => {
           setAlert(error.response.data);
           console.log(error.response.data);
-          setTimeout(setAlert(""), 10000);
+          const timeout = setTimeout(() => setAlert(""), 10000);
+          setShowModal("");
         });
       setDeny("");
     }
-
-    axios
-      .get("/admin/approveCheques?page=" + page, reqHeader)
-      .then((result) => {
-        console.log(result.data);
-        setChequesList(result.data.pageOfCheques);
-        setPaginate(result.data.pager);
-        RenderPages();
-      })
-      .catch((err) => console.log(err));
   }, [approve, deny, page]);
+
+  useEffect(() =>{
+    axios
+    .get("/admin/approveCheques?page=" + page, reqHeader)
+    .then((result) => {
+      console.log(result.data);
+      setChequesList(result.data.pageOfCheques);
+      setPaginate(result.data.pager);
+      RenderPages();
+    })
+    .catch((err) => console.log(err));
+  }, [page])
 
   return (
     <div>

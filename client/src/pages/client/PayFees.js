@@ -166,12 +166,14 @@ function PayFees() {
                   <label className="form-label">Late Payment Fees</label>
                 </div>
                 <div className="form-control " disabled>
-                  {fees}
+                  ${fees}
                 </div>
               </Col>
               <Col>
-                <div className="form-group">
-                  <label className="form-label">Value</label>
+              <label className="form-label">Payment</label>
+                <div className="input-group">
+                  
+                  <span class="input-group-text" id="basic-addon1">$</span>
                   <Field
                     className="form-control"
                     type="number"
