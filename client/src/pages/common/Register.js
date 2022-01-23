@@ -1,7 +1,7 @@
 /**
  * Client registration
  */
-import React from 'react';
+ import React, { useState} from "react";
 import {Formik, Form, Field, ErrorMessage} from 'formik';
 import * as yup from 'yup';
 import axios from 'axios';
@@ -10,6 +10,10 @@ import { Row, Col } from 'react-bootstrap';
 
 
 function Register() {
+
+  const [alert, setAlert] = useState("");
+  const [success, setSuccess] = useState("");
+
     const initialValues = {
         firstName: "",
         lastName: "",
@@ -32,11 +36,14 @@ function Register() {
     });
 
     const onSubmit = newUser => {
+      setAlert("");
+      setSuccess("");
         axios.post("/users/register", newUser).then(res => {
           console.log(res.data);
           navigate('/login');
         }).catch(err => {
-          console.log(err.response.data.error);
+          console.log(err.response.data);
+          setAlert(err.response.data);
         });
     };
 
@@ -45,6 +52,16 @@ function Register() {
     return (
         <div className='col-8 card'>
           <div className='card-header'>Register</div>
+          {alert && (
+        <div className="alert alert-danger" role="alert">
+          {alert}
+        </div>
+      )}
+      {success && (
+        <div className="alert alert-success" role="alert">
+          {success}
+        </div>
+      )}
         <Formik
           initialValues={initialValues}
           onSubmit={onSubmit}
@@ -82,7 +99,7 @@ function Register() {
               className="inputNewEntry form-control"
               name="phone"
               type="phone"
-              placeholder="(Ex. John123...)"
+              placeholder="(Ex. 5147920067)"
             />
             <ErrorMessage name="phone" render={msg => <span class="text-danger">{msg}</span>} />
             </Col>
@@ -103,7 +120,7 @@ function Register() {
               className="inputNewEntry form-control"
               name="sin"
               type="text"
-              placeholder="(Ex. John123...)"
+              placeholder="(Ex. 086254963)"
             />
             <ErrorMessage name="sin" render={msg => <span class="text-danger">{msg}</span>} />
             </Col>
@@ -114,7 +131,7 @@ function Register() {
               className="inputNewEntry form-control"
               name="email"
               type="email"
-              placeholder="(Ex. John123...)"
+              placeholder="(Ex. jane@me.com)"
             />
             <ErrorMessage name="email" render={msg => <span class="text-danger">{msg}</span>} />
             </Col>
@@ -127,7 +144,7 @@ function Register() {
               type="password"
               className="inputNewEntry form-control"
               name="password"
-              placeholder="Choose a password..."
+              placeholder="Enter your password..."
             />
             <ErrorMessage name="password" render={msg => <span class="text-danger">{msg}</span>} />
             </Col>

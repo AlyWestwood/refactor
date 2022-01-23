@@ -4,20 +4,26 @@ const { Users } = require("../models");
 const bcrypt = require("bcrypt");
 var validator = require("email-validator");
 const { createTokens, validateToken } = require("../misc/authware");
+const Op = require("Sequelize").Op;
 
 router.post("/register", async (req, res) => {
   const user = req.body;
 
   const { email, password } = user;
 
+  const duplicate = await Users.findOne({where: {[Op.or]: {email: email, sin: user.sin}}});
+  if(duplicate){
+    return res.status(400).json("SIN and email must not be in use already.")
+  }
+
   if (!validator.validate(email)) {
     res
       .status(400)
-      .json({ error: "Error: Email must look like a valid email" });
+      .json( "Email must look like a valid email" );
     return;
   }
   if (password.length > 50 || password.length < 4) {
-    res.status(400).json({ error: "Error: Password must be 4-50 characters" });
+    res.status(400).json("Password must be 4-50 characters");
     return;
   }
   if (
@@ -26,7 +32,7 @@ router.post("/register", async (req, res) => {
     user.lastName > 100 ||
     user.lastName < 2
   ) {
-    res.status(400).json({ error: "Error: Names must be 2 - 100 characters" });
+    res.status(400).json("Names must be 2 - 100 characters");
     return;
   }
   if (!user.phone.match(/[0-9]{10}/)) {
