@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from 'react-router-dom';
 import axios from "axios";
 import { Card, Button, Row, Col } from "react-bootstrap";
 import { reqHeader } from "../../misc/reqHeader";
@@ -12,6 +13,7 @@ function PayFees() {
   const [success, setSuccess] = useState("");
   const [fees, setFees] = useState("0.00");
   const [feesMap, setFeesMap] = useState([]);
+  const params = useParams();
 
   useEffect(() => {
     axios
@@ -26,24 +28,32 @@ function PayFees() {
       .get("/accounts/withFees", reqHeader)
       .then((result) => {
         console.log(result.data);
-        setFeesAccounts(result.data);
+        if(!params.accountId){
+          setFeesAccounts(result.data);
         initialValues.accountWithFees = result.data[0].id;
         setFees(result.data[0].latePaymentFees);
         console.log(initialValues.accountWithFees);
-
         let feesArray = [];
         for (let i = 0; i < result.data.length; i++) {
           feesArray[result.data[i].id] = result.data[i].latePaymentFees;
         }
         setFeesMap(feesArray);
         console.log(feesArray)
+        }else{
+          const accountsArray = result.data.filter(account => parseInt(account.id) === parseInt(params.accountId));
+          console.log(accountsArray);
+          setFees(accountsArray[0].latePaymentFees);
+          setFeesAccounts(accountsArray);
+          initialValues.accountWithFees = accountsArray[0].id;
+        }
       })
       .catch((error) => {
-        console.log(error.response);
+        console.log("error!!!!");
+        console.log(error);
       });
   }, [success]);
 
-  const initialValues = {
+  let initialValues = {
     payerAccountId: "",
     accountWithFees: "",
     originValue: "",
@@ -151,6 +161,7 @@ function PayFees() {
                         </option>
                       );
                     })}
+                    
                   </Field>
                 </div>
                 <ErrorMessage
@@ -173,7 +184,7 @@ function PayFees() {
               <label className="form-label">Payment</label>
                 <div className="input-group">
                   
-                  <span class="input-group-text" id="basic-addon1">$</span>
+                  <span className="input-group-text" id="basic-addon1">$</span>
                   <Field
                     className="form-control"
                     type="number"
