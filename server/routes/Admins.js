@@ -25,8 +25,13 @@ router.get("/approveUsers", validateAdminToken, async (req, res) => {
  * returns all users 
  */
 router.get("/allUsers", validateAdminToken, async (req, res) => {
-  const listOfUsers = await Users.findAll();
+  let sort = req.query.sort;
+  if(!sort){
+    sort = "activeStatus";
+  }
+  const listOfUsers = await Users.findAll({order: [[sort, 'DESC']]});
 
+  
   res.json({listOfUsers: listOfUsers});
 })
 
@@ -215,8 +220,11 @@ return res.json("Successfully rejected cheque");
 
 });
 
+/**
+ * status should be "active" or "disabled"
+ */
 router.put("/approveCreditAccounts", validateAdminToken, async (req, res) => {
-  const { creditLimit, interestRate, accountId } = req.body;
+  const { creditLimit, interestRate, accountId, status } = req.body;
 
   let error = await validateCreditUpdate(req.body);
   if (error) {
@@ -231,7 +239,7 @@ router.put("/approveCreditAccounts", validateAdminToken, async (req, res) => {
     creditLimit: creditLimit,
     interestRate: interestRate,
     nextPaymentDueDate: date,
-    activeStatus: "active",
+    activeStatus: status,
   };
 
   await Accounts.update(updateAccount, { where: { id: accountId } });
