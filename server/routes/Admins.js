@@ -148,7 +148,6 @@ router.get("/chequeImage/:chequeId/:token", async (req, res) => {
  * get all cheques on hold
  */
 router.get("/approveCheques", validateAdminToken, async (req, res) => {
-  console.log("in approve")
   const chequeList = await db.sequelize.query('select firstName, lastName, uploadDate, transactions.payerAccount, transactions.payeeAccount, chequeNumber, originValue, targetValue, originCurrency, targetCurrency, cheques.id as chequeId from cheques join transactions on cheques.id = transactions.chequeId join accounts on accounts.id = transactions.payeeAccount left join users on users.id = accounts.userId where cheques.`status` = "on hold";');
 
   const page = parseInt(req.query.page) || 1;

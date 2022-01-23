@@ -19,12 +19,7 @@ function ApproveCheques() {
     if (paginate.currentPage > 1) {
       pages.push(
         <li className="page-item">
-          <a
-            className="page-link"
-            onClick={() => {
-              setPage(paginate.currentPage - 1);
-            }}
-          >
+          <a className="page-link" onClick={() => {setPage(paginate.currentPage - 1);}}>
             Previous
           </a>
         </li>
@@ -32,12 +27,7 @@ function ApproveCheques() {
     } else {
       pages.push(
         <li className="page-item disabled">
-          <a
-            className="page-link "
-            onClick={() => {
-              setPage(paginate.currentPage - 1);
-            }}
-          >
+          <a className="page-link " onClick={() => {setPage(paginate.currentPage - 1);}}>
             Previous
           </a>
         </li>
@@ -47,12 +37,7 @@ function ApproveCheques() {
       if (i === paginate.currentPage) {
         pages.push(
           <li className="page-item active">
-            <a
-              className="page-link"
-              onClick={() => {
-                setPage(i);
-              }}
-            >
+            <a className="page-link" onClick={() => {setPage(i);}}>
               {i}
             </a>
           </li>
@@ -60,12 +45,7 @@ function ApproveCheques() {
       } else {
         pages.push(
           <li className="page-item">
-            <a
-              className="page-link"
-              onClick={() => {
-                setPage(i);
-              }}
-            >
+            <a className="page-link" onClick={() => {setPage(i);}}>
               {i}
             </a>
           </li>
@@ -75,12 +55,7 @@ function ApproveCheques() {
     if (paginate.currentPage !== paginate.endPage) {
       pages.push(
         <li className="page-item">
-          <a
-            className="page-link"
-            onClick={() => {
-              setPage(Number(paginate.currentPage) + 1);
-            }}
-          >
+          <a className="page-link"  onClick={() => {setPage(Number(paginate.currentPage) + 1);}}>
             Next
           </a>
         </li>
@@ -88,12 +63,7 @@ function ApproveCheques() {
     } else {
       pages.push(
         <li className="page-item disabled">
-          <a
-            className="page-link "
-            onClick={() => {
-              setPage(Number(paginate.currentPage) + 1);
-            }}
-          >
+          <a className="page-link " onClick={() => {setPage(Number(paginate.currentPage) + 1);}}>
             Next
           </a>
         </li>
@@ -150,7 +120,7 @@ function ApproveCheques() {
       console.log(result.data);
       setChequesList(result.data.pageOfCheques);
       setPaginate(result.data.pager);
-      RenderPages();
+      // RenderPages();
     })
     .catch((err) => console.log(err));
   }, [page])
