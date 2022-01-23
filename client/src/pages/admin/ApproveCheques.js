@@ -1,74 +1,157 @@
-import React, { useState,  useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Card, Button, Row, Col } from "react-bootstrap";
-// import { reqHeader } from "../../misc/reqHeader";
-import { Formik, Field, ErrorMessage, Form } from "formik";
-import * as Yup from "yup";
+import { Card, ListGroup, Row, Col, Modal, Button } from "react-bootstrap";
+import { reqHeader } from "../../misc/reqHeader";
 
+function ApproveCheques() {
+  const [chequesList, setChequesList] = useState([]);
+  const [showModal, setShowModal] = useState("");
+  const [token] = useState(localStorage.getItem("accessToken"));
+  const [approve, setApprove] = useState("");
+  const [deny, setDeny] = useState("");
+  const [success, setSuccess] = useState("");
+  const [alert, setAlert] = useState("");
+  const [paginate, setPaginate] = useState("");
+  const [page, setPage] = useState(0);
 
-function ApproveCheques() {/*
-    const [accountList, setAccountList] = useState([]);
-    const [alert, setAlert] = useState("");
-    const [success, setSuccess] = useState("");
-    useEffect(() => {
+  function RenderPages() {
+    let pages = [];
+    if (paginate.currentPage > 1) {
+      pages.push(
+        <li className="page-item">
+          <a
+            className="page-link"
+            onClick={() => {
+              setPage(paginate.currentPage - 1);
+            }}
+          >
+            Previous
+          </a>
+        </li>
+      );
+    } else {
+      pages.push(
+        <li className="page-item disabled">
+          <a
+            className="page-link "
+            onClick={() => {
+              setPage(paginate.currentPage - 1);
+            }}
+          >
+            Previous
+          </a>
+        </li>
+      );
+    }
+    for (let i = 1; i < paginate.totalPages + 1; i++) {
+      if (i === paginate.currentPage) {
+        pages.push(
+          <li className="page-item active">
+            <a
+              className="page-link"
+              onClick={() => {
+                setPage(i);
+              }}
+            >
+              {i}
+            </a>
+          </li>
+        );
+      } else {
+        pages.push(
+          <li className="page-item">
+            <a
+              className="page-link"
+              onClick={() => {
+                setPage(i);
+              }}
+            >
+              {i}
+            </a>
+          </li>
+        );
+      }
+    }
+    if (paginate.currentPage !== paginate.endPage) {
+      pages.push(
+        <li className="page-item">
+          <a
+            className="page-link"
+            onClick={() => {
+              setPage(Number(paginate.currentPage) + 1);
+            }}
+          >
+            Next
+          </a>
+        </li>
+      );
+    } else {
+      pages.push(
+        <li className="page-item disabled">
+          <a
+            className="page-link "
+            onClick={() => {
+              setPage(Number(paginate.currentPage) + 1);
+            }}
+          >
+            Next
+          </a>
+        </li>
+      );
+    }
+    return <ul className="pagination m-3 justify-content-center">{pages}</ul>;
+  }
+
+  useEffect(() => {
+    if (approve !== "") {
+      const body = { status: "cleared", chequeId: approve };
       axios
-        .get("/accounts/totals", {
-          headers: {
-            accessToken: localStorage.getItem("accessToken"),
-          },
-        })
+        .put("/admin/approveCheque", body, reqHeader)
         .then((result) => {
-          setAccountList(result.data.accountTotals);
-          initialValues.payerAccountId = result.data.accountTotals[0].accountId;
-        })
-        .catch((err) => console.log(err.response.data));
-    }, []);
-  
-    const initialValues = {
-      payerAccountId: "",
-      payeeAccountId: "",
-      interval: "",
-      originValue: "",
-      startDate: "",
-    };
-  
-    const onSubmit = (data, {resetForm}) => {
-      setAlert("");
-      setSuccess("");
-      axios
-        .post("/transactions/recurringPayments", data, {
-          headers: {
-            accessToken: localStorage.getItem("accessToken"),
-          },
-        })
-        .then((response) => {
-          console.log(response);
-          setSuccess("Recurring payment created successfully");
-          resetForm();
+          console.log(result);
+          setSuccess(result.data);
+          setTimeout(setSuccess(""), 10000);
         })
         .catch((error) => {
-          console.log(error.response.data);
           setAlert(error.response.data);
+          console.log(error.response.data);
+          setTimeout(setAlert(""), 10000);
         });
-    };
-  
-    const validationSchema = Yup.object().shape({
-      payerAccountId: Yup.number().required(
-        "The account the payment will be withdrawn from is required."
-      ),
-      interval: Yup.number().required("Must have interval"),
-      payeeAccountId: Yup.string().required(
-        "The account that will receive the deposit is required."
-      ),
-      originValue: Yup.number().required("The payment value is required."),
-      startDate: Yup.date().required(
-        "The date of the first payment is required."
-      ),
-    });
-  
-    return (
-      <Card className="col-7">
-        <Card.Header>Set up a recurring payment</Card.Header>
+      setApprove("");
+    }
+
+    if (deny !== "") {
+      const body = { status: "denied", chequeId: deny };
+      axios
+        .put("/admin/approveCheque", body, reqHeader)
+        .then((result) => {
+          console.log(result);
+          setSuccess(result.data);
+          setTimeout(setSuccess(""), 10000);
+        })
+        .catch((error) => {
+          setAlert(error.response.data);
+          console.log(error.response.data);
+          setTimeout(setAlert(""), 10000);
+        });
+      setDeny("");
+    }
+
+    axios
+      .get("/admin/approveCheques?page=" + page, reqHeader)
+      .then((result) => {
+        console.log(result.data);
+        setChequesList(result.data.pageOfCheques);
+        setPaginate(result.data.pager);
+        RenderPages();
+      })
+      .catch((err) => console.log(err));
+  }, [approve, deny, page]);
+
+  return (
+    <div>
+      <Card className="col-10">
+        <Card.Header>Cheques requiring approval</Card.Header>
         {alert && (
           <div className="alert alert-danger" role="alert">
             {alert}
@@ -79,121 +162,120 @@ function ApproveCheques() {/*
             {success}
           </div>
         )}
-        <Card.Body>
-          <Formik
-            initialValues={initialValues}
-            onSubmit={onSubmit}
-            validationSchema={validationSchema}
-            // validator={() => ({})}
-          >
-            <Form>
-              <Row>
-                <Col>
-                  <div className="form-group">
-                    <label className="form-label">From Account</label>
-                    <Field
-                      as="select"
-                      className="form-select"
-                      name="payerAccountId"
-                    >
-                      {accountList.map((account) => {
-                        return (
-                          <option
-                            key={account.accountId}
-                            value={account.accountId}
-                          >
-                            Account #{account.accountId} - {account.currency}{" "}
-                            {account.accountType}
-                          </option>
-                        );
-                      })}
-                    </Field>
-                  </div>
-                  <ErrorMessage
-                    className="text-danger"
-                    name="payerAccountId"
-                    component="span"
-                  />
-                </Col>
-                <Col>
-                  <div className="form-group">
-                    <label className="form-label">Pay To</label>
-                    <Field
-                      className="form-control"
-                      type="number"
-                      name="payeeAccountId"
-                      placeholder="Account Number"
-                      min="1"
-                    />
-                  </div>
-                  <ErrorMessage
-                    className="text-danger"
-                    name="payeeAccountId"
-                    component="span"
-                  />
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <div className="form-group">
-                    <label className="form-label">Value</label>
-                    <Field
-                      className="form-control"
-                      type="number"
-                      name="originValue"
-                      placeholder="Amount to be withdrawn in the currency of the original account"
-                      min="1"
-                      step=".01"
-                    />
-                  </div>
-                  <ErrorMessage
-                    className="text-danger"
-                    name="originValue"
-                    component="span"
-                  />
-                </Col>
-                <Col>
-                  <div className="form-group">
-                    <label className="form-label">Repeating Interval</label>
-                    <Field
-                      className="form-control"
-                      type="number"
-                      name="interval"
-                      placeholder="Number of days between payments"
-                      min="1"
-                    />
-                  </div>
-                  <ErrorMessage
-                    className="text-danger"
-                    name="interval"
-                    component="span"
-                  />
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <div className="form-group">
-                    <label className="form-label">Payment start date</label>
-                    <Field
-                      className="form-control"
-                      type="date"
-                      name="startDate"
-                    />
-                  </div>
-                  <ErrorMessage
-                    className="text-danger"
-                    name="startDate"
-                    component="span"
-                  />
-                </Col>
-              </Row>
-              <Button type="submit">Create recurring payment</Button>
-            </Form>
-          </Formik>
-        </Card.Body>
+        <ListGroup>
+          <ListGroup.Item>
+            <Row>
+              <Col>Cheque Number</Col>
+              <Col>Upload Date</Col>
+              <Col>Payer Account Id</Col>
+              <Col>Payee Account Id</Col>
+            </Row>
+          </ListGroup.Item>
+          {chequesList &&
+            chequesList.map((cheque) => {
+              return (
+                <ListGroup.Item
+                  key={cheque.chequeId}
+                  onClick={() => {
+                    setShowModal(cheque.chequeId);
+                  }}
+                >
+                  <Row>
+                    <Col>{cheque.chequeNumber}</Col>
+                    <Col>{cheque.uploadDate}</Col>
+                    <Col>{cheque.payerAccount}</Col>
+                    <Col>{cheque.payeeAccount}</Col>
+                  </Row>
+                </ListGroup.Item>
+              );
+            })}
+        </ListGroup>
+        <RenderPages />
       </Card>
-    );*/
-  }
-  
+      {chequesList.map((chequeTransaction) => {
+        return (
+          <Modal
+            key={"modal" + chequeTransaction.chequeId}
+            size="xl"
+            show={showModal === chequeTransaction.chequeId}
+            onHide={() => setShowModal(false)}
+            centered
+          >
+            <Modal.Header
+              closeButton
+              closeVariant="white"
+              className="bg-secondary text-white"
+            >
+              Transaction # {chequeTransaction.chequeId}
+            </Modal.Header>
+            <Modal.Body>
+              <Row className="justify-content-md-center">
+                <Col>
+                  <img
+                    src={`http://localhost:3001/admin/chequeImage/${chequeTransaction.chequeId}/${token}`}
+                    width="700px"
+                  ></img>
+                </Col>
+                <Col>
+                  <ListGroup>
+                    <ListGroup.Item>
+                      <Row>
+                        <Col>Payee name: </Col>
+                        <Col>
+                          {chequeTransaction.firstName}{" "}
+                          {chequeTransaction.lastName}
+                        </Col>
+                      </Row>
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <Row>
+                        <Col>Upload date: </Col>
+                        <Col>{chequeTransaction.uploadDate}</Col>
+                      </Row>
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <Row>
+                        <Col>Value on cheque: </Col>
+                        <Col>{chequeTransaction.originValue}</Col>
+                      </Row>
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <Row>
+                        <Col>Payer account number</Col>
+                        <Col>{chequeTransaction.payerAccount}</Col>
+                      </Row>
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <Row>
+                        <Col>Cheque number</Col>
+                        <Col>{chequeTransaction.chequeNumber}</Col>
+                      </Row>
+                    </ListGroup.Item>
+                  </ListGroup>
+                  <Row className="justify-content-md-center m-3">
+                    <Col>
+                      <Button
+                        onClick={() => setApprove(chequeTransaction.chequeId)}
+                      >
+                        Approve Cheque
+                      </Button>
+                    </Col>
+                    <Col>
+                      <Button
+                        onClick={() => setDeny(chequeTransaction.chequeId)}
+                      >
+                        Deny Cheque
+                      </Button>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+            </Modal.Body>
+          </Modal>
+        );
+      })}
+    </div>
+  );
+}
 
-export default ApproveCheques
+export default ApproveCheques;

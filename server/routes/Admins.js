@@ -8,7 +8,7 @@ const router = express.Router();
 const { Users, Accounts, Cheques, Transactions } = require("../models");
 const { downloadCheque } = require("../utils/utils");
 const db = require("../models/index");
-const { Account } = require("aws-sdk");
+const paginate = require('jw-paginate');
 
 /**
  * returns the inactive users in an array of objects
@@ -143,13 +143,25 @@ router.get("/chequeImage/:chequeId/:token", async (req, res) => {
     });
 });
 
+
 /**
- * data required: 
- * {
-    "status": "cleared",
-    "chequeId": 2
-}
+ * get all cheques on hold
  */
+router.get("/approveCheques", validateAdminToken, async (req, res) => {
+  console.log("in approve")
+  const chequeList = await db.sequelize.query('select firstName, lastName, uploadDate, transactions.payerAccount, transactions.payeeAccount, chequeNumber, originValue, targetValue, originCurrency, targetCurrency, cheques.id as chequeId from cheques join transactions on cheques.id = transactions.chequeId join accounts on accounts.id = transactions.payeeAccount left join users on users.id = accounts.userId where cheques.`status` = "on hold";');
+
+  const page = parseInt(req.query.page) || 1;
+
+  const pageSize = 1;
+  const pager = paginate(chequeList[0].length, page, pageSize);
+
+  const pageOfCheques = chequeList[0].slice(pager.startIndex, pager.endIndex + 1);
+  
+  return res.json({pager, pageOfCheques});
+})
+
+
 router.get("/approveCheque/:chequeId", validateAdminToken, async (req, res) => {
   const chequeId = req.params.chequeId;
   const cheque = await Cheques.findByPk(chequeId).catch((error) => {
@@ -163,7 +175,14 @@ router.get("/approveCheque/:chequeId", validateAdminToken, async (req, res) => {
   return res.json(cheque);
 });
 
-router.put("/approveCheque/", validateAdminToken, async (req, res) => {
+/**
+ * data required: 
+ * {
+    "status": "cleared",
+    "chequeId": 2
+}
+ */
+router.put("/approveCheque", validateAdminToken, async (req, res) => {
   const { status, chequeId } = req.body;
   const result = await db.sequelize
   .query(
@@ -181,8 +200,8 @@ router.put("/approveCheque/", validateAdminToken, async (req, res) => {
         const payeeUpdateValues = {
           balance:
           payeeAccountType === "credit"
-              ? Number(payeeBalance) - targetValue
-              : Number(payeeBalance) + targetValue,
+              ? Number(payeeBalance) - Number(targetValue)
+              : Number(payeeBalance) + Number(targetValue),
         };
         Accounts.update(payeeUpdateValues, {where: {id: payeeAccountId}});
         Transactions.update({status: "accepted"}, {where: {id: transactionId}});
