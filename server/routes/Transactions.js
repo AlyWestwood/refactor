@@ -156,7 +156,7 @@ router.put("/cancelRecurringPayment", validateToken, (req, res) => {
 });
 
 /**
- * recurring payments by user 
+ * recurring payments by user
  */
 router.get("/recurringPayments", validateToken, async (req, res) => {
   const userId = req.userId;
@@ -165,7 +165,10 @@ router.get("/recurringPayments", validateToken, async (req, res) => {
       'select paymentDate, originValue, `interval`, payerAccount, payeeAccount  from recurringPayments join accounts on recurringPayments.payerAccount = accounts.id join users on accounts.userId = users.id where recurringpayments.activeStatus = "active" and userId = ?',
       { replacements: [userId] }
     )
-    .then((response) => {res.json(response)}).catch((error) => {
+    .then((response) => {
+      res.json(response);
+    })
+    .catch((error) => {
       res.status(404).json("Could not find any recurring payments");
     });
 });
@@ -180,16 +183,18 @@ router.get(
     const userId = req.userId;
     const { accountNumber } = req.params;
 
-    const recurringPayments = await RecurringPayments.findAll({
-      where: { payerAccount: accountNumber },
-    });
+    const recurringPayments = await db.sequelize.query(
+      "select recurringpayments.id, `interval`, paymentDate, originValue, recurringpayments.activeStatus, payerAccount, payeeAccount, accountType, currency from recurringpayments join accounts on accounts.id = recurringpayments.payerAccount where payerAccount = ? and accounts.userId = ?;",
+      { replacements: [accountNumber, userId] }
+    );
     if (recurringPayments.length > 0) {
-      const account = await Accounts.findByPk(
-        recurringPayments[0].payerAccount
-      );
-      if (account.userId === userId) {
-        return res.json(recurringPayments);
-      }
+      return res.json(recurringPayments[0])
+      // const account = await Accounts.findByPk(
+      //   recurringPayments[0].payerAccount
+      // );
+      // if (account.userId === userId) {
+      //   return res.json(recurringPayments);
+      // }
     }
     return res.json("No recurring payments on this accounts");
   }
@@ -353,10 +358,9 @@ router.post("/transferFunds", validateToken, async (req, res) => {
       console.log(result);
     });
     return res.json("Fees have been paid");
-  }else{
+  } else {
     return res.json("Transferred successfully");
   }
-  
 });
 
 /**
