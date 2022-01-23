@@ -3,18 +3,36 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { reqHeader } from '../../misc/reqHeader';
 import DisplayAccount from '../../components/DisplayAccount';
-import { Col, Card, ListGroup } from 'react-bootstrap';
+import { Col, Card, ListGroup, Button } from 'react-bootstrap';
 
 function Account() {
     const params = useParams();
     const [account, setAccount] = useState({});
-
+    const [closeAcct, setClose] = useState(false);
+    const [alert, setAlert] = useState("");
+    const [success, setSuccess] = useState("");
 
     useEffect(() => {
         axios.get(`/accounts/singleAccount/${params.accountId}`, reqHeader)
         .then(res => setAccount(res.data.account))
         .catch(err => alert(err.response.data.error))
     }, [params.accountId]);
+
+    useEffect(() => {
+        setSuccess("");
+        setAlert("");
+        if(closeAcct === true){
+            const body = {
+                accountId: params.accountId
+            }
+            axios.put("/accounts/closeAccount", body, reqHeader).then((result) => {
+                setSuccess(result.data);
+            }).catch((error)=>{
+                console.log(error.response.data);
+                setAlert(error.response.data);
+            })
+        }
+    }, [closeAcct])
 
     if(account.activeStatus !== 'active'){
         return (
@@ -25,6 +43,16 @@ function Account() {
     return (
         <>
         <Col md={9}>
+            {alert && (
+        <div className="alert alert-danger" role="alert">
+          {alert}
+        </div>
+      )}
+      {success && (
+        <div className="alert alert-success" role="alert">
+          {success}
+        </div>
+      )}
             <DisplayAccount key={account.id} account={account}/>
         </Col>
         <Col>
@@ -46,6 +74,10 @@ function Account() {
                     </ListGroup.Item>
                     <ListGroup.Item>
                         <Link to={`/client/newrecurringpayment/${account.id}`}>Set up a recurring payment</Link>
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                        {account.balance === "0.00" ? <Button type="button" onClick={() => {setClose(true)}}>Close Account</Button> : <Button disabled type="button" className='btn-secondary'>Close Account</Button> }
+                        
                     </ListGroup.Item>
                 </ListGroup>
             </Card>        

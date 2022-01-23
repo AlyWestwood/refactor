@@ -11,7 +11,7 @@ const Op = require("Sequelize").Op;
 router.get("/getAccounts", validateToken, async (req, res) => {
   const userId = req.userId;
   const listOfAccounts = await Accounts.findAll({
-    where: { userId: userId },
+    where: { userId: userId, activeStatus: {[Op.ne]: "disabled"} },
   });
 
   res.json({ listOfAccounts: listOfAccounts });
@@ -161,7 +161,7 @@ router.post("/createAccount", validateToken, async (req, res) => {
  * params: a logged in user, account id
  *
  */
-router.post("/closeAccount", validateToken, async (req, res) => {
+router.put("/closeAccount", validateToken, async (req, res) => {
   const userId = req.userId;
   const { accountId } = req.body;
   const account = await Accounts.findOne({
@@ -182,7 +182,7 @@ router.post("/closeAccount", validateToken, async (req, res) => {
 
   Accounts.update({ activeStatus: "disabled" }, { where: { id: accountId } })
     .then((response) => {
-      return res.json("account " + accountId + " disabled");
+      return res.json("Account " + accountId + " closed successfully.");
     })
     .catch((error) => {
       return res.json(error);
