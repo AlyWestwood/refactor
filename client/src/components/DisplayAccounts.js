@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Card, ListGroup, Row, Col } from 'react-bootstrap';
+import { Card, ListGroup, Row, Col, Button } from 'react-bootstrap';
 import { reqHeader } from '../misc/reqHeader';
 import { assignTransaction, getSymbol } from '../misc/accountUtils';
 
@@ -18,7 +18,12 @@ function DisplayAccounts({account}){
     useEffect(() => {
         axios.get(`/transactions/byAccount/${account.id}`, reqHeader)
         .then(res => {
-            setTransactionList(res.data);
+            if(res.data.length > 5){
+                setTransactionList(res.data.slice(0,5));
+            }else{
+             
+            setTransactionList(res.data);   
+            }
             // console.log(transactionList)
         })
     }, [account]);
@@ -40,6 +45,7 @@ function DisplayAccounts({account}){
                                     {assignTransaction(transaction, account.id)}
                             </ListGroup.Item>
                             )})}
+                            <ListGroup.Item><div className='text-primary text-decoration-underline'>More Account Details</div></ListGroup.Item>
                 </ListGroup>}
         </Card>
         </>

@@ -13,16 +13,77 @@ function DisplayAccount({account}){
     const [transactionList, setTransactionList] = useState([]);
     const [showModal, setShowModal] = useState([]);
     const navigate = useNavigate();
+    const [paginate, setPaginate] = useState("");
+    const [page, setPage] = useState(0);
     
     const currency = getSymbol(account.currency)
+
+    function RenderPages() {
+        let pages = [];
+        if (paginate.currentPage > 1) {
+          pages.push(
+            <li className="page-item">
+              <a className="page-link" onClick={() => {setPage(paginate.currentPage - 1);}}>
+                Previous
+              </a>
+            </li>
+          );
+        } else {
+          pages.push(
+            <li className="page-item disabled">
+              <a className="page-link " onClick={() => {setPage(paginate.currentPage - 1);}}>
+                Previous
+              </a>
+            </li>
+          );
+        }
+        for (let i = 1; i < paginate.totalPages + 1; i++) {
+          if (i === paginate.currentPage) {
+            pages.push(
+              <li className="page-item active">
+                <a className="page-link" onClick={() => {setPage(i);}}>
+                  {i}
+                </a>
+              </li>
+            );
+          } else {
+            pages.push(
+              <li className="page-item">
+                <a className="page-link" onClick={() => {setPage(i);}}>
+                  {i}
+                </a>
+              </li>
+            );
+          }
+        }
+        if (paginate.currentPage !== paginate.endPage) {
+          pages.push(
+            <li className="page-item">
+              <a className="page-link"  onClick={() => {setPage(Number(paginate.currentPage) + 1);}}>
+                Next
+              </a>
+            </li>
+          );
+        } else {
+          pages.push(
+            <li className="page-item disabled">
+              <a className="page-link " onClick={() => {setPage(Number(paginate.currentPage) + 1);}}>
+                Next
+              </a>
+            </li>
+          );
+        }
+        return <ul className="pagination m-3 justify-content-center">{pages}</ul>;
+      }
     
     useEffect(() => {
-        axios.get(`/transactions/byAccount/${account.id}`, reqHeader)
+        axios.get(`/transactions/byAccountPage/${account.id}?page=` + page, reqHeader)
         .then(res => {
-            setTransactionList(res.data);
+            setTransactionList(res.data.pageOfTransactions);
+            setPaginate(res.data.pager);
             // console.log(transactionList)
         })
-    }, [account]);
+    }, [account, page]);
 
 
     return (
@@ -46,6 +107,7 @@ function DisplayAccount({account}){
                         </ListGroup.Item>
                         )})}
             </ListGroup>}
+            <RenderPages />
         </Card>
 
         {transactionList.map(transaction =>{

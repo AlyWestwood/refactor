@@ -20,6 +20,35 @@ const {
 } = require("../utils/utils");
 const Op = require("Sequelize").Op;
 const multiparty = require("multiparty");
+const paginate = require('jw-paginate');
+
+/**
+ * gets transactions of specific account after verifying account can be accessed by logged in user
+ *
+ * this is for a paginated view
+ * params: logged in user, account id in url, page
+ * returns: all transactions of the account - deposits and withdrawls
+ */
+router.get("/byAccountPage/:accountId", validateToken, async (req, res) => {
+  const accountId = req.params.accountId;
+  const account = await Accounts.findOne({ where: { userId: req.userId } });
+  if (!account) {
+    return res.status(404).json({ error: "No account found" });
+  }
+  const listOfTransactions = await Transactions.findAll({
+    where: {
+      [Op.or]: [{ payeeAccount: accountId }, { payerAccount: accountId }],
+    },
+  });
+
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = 8;
+  const pager = paginate(listOfTransactions.length, page, pageSize);
+
+  const pageOfTransactions = listOfTransactions.slice(pager.startIndex, pager.endIndex + 1);
+
+  res.json({pager, pageOfTransactions});
+});
 
 /**
  * gets transactions of specific account after verifying account can be accessed by logged in user
@@ -41,6 +70,8 @@ router.get("/byAccount/:accountId", validateToken, async (req, res) => {
 
   res.json(listOfTransactions);
 });
+
+
 
 /**
  * gets single transaction
