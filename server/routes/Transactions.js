@@ -512,7 +512,7 @@ router.post("/depositCheque", validateToken, async (req, res) => {
     payeeAccountId === payerAccountId ||
     originAccount.userId === targetAccount.userId
   ) {
-    return res.status(403).json("Unable to transfer to that account");
+    return res.status(403).json("Unable to transfer between these accounts.");
   }
   const duplicateCheques = await Cheques.findAll({
     where: { payerAccount: payerAccountId, chequeNumber: chequeNumber },
