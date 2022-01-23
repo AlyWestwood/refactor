@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Card, ListGroup, Row, Col, Modal, Table, Button } from 'react-bootstrap';
 import { reqHeader } from '../misc/reqHeader';
-import { assignTransaction, getSymbol, parseDate } from '../misc/accountUtils';
+import { assignTransaction, getSymbol, parseDateTime } from '../misc/accountUtils';
 
 function DisplayAccount({account}){
     const [transactionList, setTransactionList] = useState([]);
@@ -71,7 +71,7 @@ function DisplayAccount({account}){
                             </tr>
                             <tr>
                                 <th>Time Stamp</th>
-                                <td>{parseDate(transaction.transactionDate)}</td>
+                                <td>{parseDateTime(transaction.transactionDate)}</td>
                             </tr>
                             <tr>
                                 <th>Payer Account Value</th>
