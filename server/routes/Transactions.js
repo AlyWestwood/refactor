@@ -162,7 +162,7 @@ router.get("/recurringPayments", validateToken, async (req, res) => {
   const userId = req.userId;
   db.sequelize
     .query(
-      'select paymentDate, originValue, `interval`, payerAccount, payeeAccount  from recurringPayments join accounts on recurringPayments.payerAccount = accounts.id join users on accounts.userId = users.id where recurringpayments.activeStatus = "active" and userId = ?',
+      'select recurringpayments.id, recurringpayments.activeStatus, paymentDate, originValue, `interval`, payerAccount, accountType, payeeAccount, currency from recurringPayments join accounts on recurringPayments.payerAccount = accounts.id join users on accounts.userId = users.id where recurringpayments.activeStatus = "active" and userId = ?',
       { replacements: [userId] }
     )
     .then((response) => {
@@ -262,6 +262,16 @@ router.post("/transferFunds", validateToken, async (req, res) => {
     targetAccount.currency,
     originValue
   );
+
+  if (payingFees === true) {
+    accountCarryingFees = await Accounts.findByPk(accountWithFees);
+    if (accountCarryingFees.userId !== originAccount.userId) {
+      return res.status(403).json("You cannot pay the fees on that account");
+    }
+    if (accountCarryingFees.latePaymentFees < targetValue) {
+      return res.status(400).json("Cannot over pay late fees.");
+    }
+  }
 
   const transaction = {
     originValue: originValue,
