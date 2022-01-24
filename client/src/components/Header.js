@@ -8,7 +8,10 @@ import {Navbar, Nav, NavDropdown} from 'react-bootstrap';
 function LoggedIn(){
     // const navigate = Navigate()
     return (
+        <>
+        <Nav.Link href="/client/profile" className='headerbtn'>Your Client Profile</Nav.Link>
         <Nav.Link href="/logout" className='headerbtn'>Log Out</Nav.Link>
+        </>
         )
     }
     
@@ -33,7 +36,6 @@ function Client(){
             <NavDropdown.Item href="/client/transfer">Transfer funds</NavDropdown.Item>
             <NavDropdown.Item href="/client/payfees">Pay Credit Fees</NavDropdown.Item>
         </NavDropdown>
-        <Nav.Link href="/client/profile">Your Client Profile</Nav.Link>
         </>
     )
 }
