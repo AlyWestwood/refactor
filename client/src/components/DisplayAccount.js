@@ -13,6 +13,7 @@ function DisplayAccount({account}){
     const [showModal, setShowModal] = useState([]);
     const [paginate, setPaginate] = useState("");
     const [page, setPage] = useState(0);
+    const [cheque, setCheque] = useState(false);
     
     const currency = getSymbol(account.currency)
 
@@ -83,7 +84,10 @@ function DisplayAccount({account}){
         })
     }, [account, page]);
 
-
+    const getCheque = function(chequeId){
+        setShowModal([]);
+        setCheque(chequeId);
+    }
     return (
         <>
          <Card className='m-3' > 
@@ -149,7 +153,7 @@ function DisplayAccount({account}){
                             {transaction.chequeId && 
                             <tr>
                                 <th>Cheque</th>
-                                <td><Button variant='outline-primary'>View Cheque</Button></td>
+                                <td><Button variant='outline-primary' onClick={() => getCheque(transaction.chequeId)}>View Cheque</Button></td>
                             </tr>}
                             
                             <tr>
@@ -164,6 +168,15 @@ function DisplayAccount({account}){
                 </Modal.Body>
             </Modal>
         )})}
+
+        <Modal
+                size = 'lg'
+                show = { cheque }
+                onHide = {() => setCheque(false)}
+                centered
+                >
+            <img src={`http://localhost:3001/transactions/cheques/${cheque}/${localStorage.getItem('accessToken')}`} alt='cheque'/>
+        </Modal>
         </>
     )
 }
