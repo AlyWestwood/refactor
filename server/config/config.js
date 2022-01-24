@@ -18,7 +18,7 @@ const config = {
     password: process.env.DBPASS,
     database: "refactor",
     host: "localhost",
-    dialect: "postgres"
+    dialect: "mysql"
   }
 }
 
