@@ -203,7 +203,7 @@ router.get("/recurringPayments", validateToken, async (req, res) => {
     )
     .then((response) => {
       console.log(response)
-      res.json(response);
+      res.json(response[0]);
     })
     .catch((error) => {
       res.status(404).json("Could not find any recurring payments");
