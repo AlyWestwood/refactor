@@ -16,9 +16,9 @@ const config = {
   production: {
     username: process.env.DBUSER,
     password: process.env.DBPASS,
-    database: process.env.DATABASE,
-    host: process.env.DBHOST,
-    dialect: "mysql"
+    database: "refactor",
+    host: "localhost",
+    dialect: "postgres"
   }
 }
 
