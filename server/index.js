@@ -3,6 +3,16 @@ const bodyParser = require('body-parser');
 const app = express();
 const cors = require('cors');
 
+// for deployment
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'build')));
+
+
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
+//for deployment
 const db = require('./models');
 
 const {cron, checkCreditUpdates, checkRecurringPayments} = require("./misc/cron");
