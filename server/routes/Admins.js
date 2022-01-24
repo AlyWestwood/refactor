@@ -156,15 +156,21 @@ router.get("/chequeImage/:chequeId/:token", async (req, res) => {
  */
 router.get("/approveCheques", validateAdminToken, async (req, res) => {
   const chequeList = await db.sequelize.query('select firstName, lastName, uploadDate, transactions.payerAccount, transactions.payeeAccount, chequeNumber, originValue, targetValue, originCurrency, targetCurrency, cheques.id as chequeId from cheques join transactions on cheques.id = transactions.chequeId join accounts on accounts.id = transactions.payeeAccount left join users on users.id = accounts.userId where cheques.`status` = "on hold";');
-
+  if(!chequeList){
+    return res.status(400).json("No Cheques");
+  }
   const page = parseInt(req.query.page) || 1;
 
-  const pageSize = 1;
+  const pageSize = 4;
   const pager = paginate(chequeList[0].length, page, pageSize);
 
   const pageOfCheques = chequeList[0].slice(pager.startIndex, pager.endIndex + 1);
   
+
+
   return res.json({pager, pageOfCheques});
+
+
 })
 
 

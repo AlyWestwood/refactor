@@ -50,7 +50,7 @@ function LineChart() {
         // console.log(dates);
 
         setChartData({
-          labels: dates.map((count, index) => index +1),
+          labels: dates.map((count, index) => month + " " + (index + 1)),
           datasets: [
             {
               label: "transactions",

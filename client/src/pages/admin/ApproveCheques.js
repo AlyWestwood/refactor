@@ -15,6 +15,9 @@ function ApproveCheques() {
   const [page, setPage] = useState(0);
 
   function RenderPages() {
+    if(!paginate || !paginate.currentPage){
+      return <p>No cheques for approval</p>
+    }
     let pages = [];
     if (paginate.currentPage > 1) {
       pages.push(
