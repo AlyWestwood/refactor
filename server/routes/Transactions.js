@@ -18,7 +18,7 @@ const {
   exchangeCurrency,
   downloadCheque,
 } = require("../utils/utils");
-const Op = require("Sequelize").Op;
+const Op = require("sequelize").Op;
 const multiparty = require("multiparty");
 const paginate = require('jw-paginate');
 

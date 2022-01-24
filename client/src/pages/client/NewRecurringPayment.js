@@ -102,7 +102,7 @@ function NewRecurringPayment() {
                     className="form-select"
                     name="payerAccountId"
                   >
-                    {accountList.map((account) => {
+                    {accountList && accountList.map((account) => {
                       return (
                         <option
                           key={account.accountId}

@@ -169,7 +169,7 @@ function ApproveCheques() {
         </ListGroup>
         <RenderPages />
       </Card>
-      {chequesList.map((chequeTransaction) => {
+      {chequesList && chequesList.map((chequeTransaction) => {
         return (
           <Modal
             key={"modal" + chequeTransaction.chequeId}
