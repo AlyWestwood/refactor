@@ -50,6 +50,11 @@ router.get("/byAccountPage/:accountId", validateToken, async (req, res) => {
   res.json({pager, pageOfTransactions});
 });
 
+
+// router.get("/charts/cashFlow", validateToken, async (req, res) => {
+//   const userId = 
+// })
+
 /**
  * gets transactions of specific account after verifying account can be accessed by logged in user
  *
@@ -424,7 +429,7 @@ router.get("/cheques/:chequeId/:accessToken", async (req, res) => {
   const cheque = await Cheques.findByPk(chequeId);
   if (
     !cheque ||
-    (cheque.uploadedBy !== userId && cheque.payerAccount !== userId)
+    (cheque.payeeAccount !== userId && cheque.payerAccount !== userId)
   ) {
     return res.status(403).json({
       error: "User not authorized",
