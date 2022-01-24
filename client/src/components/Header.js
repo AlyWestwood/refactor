@@ -33,6 +33,7 @@ function Client(){
             <NavDropdown.Item href="/client/transfer">Transfer funds</NavDropdown.Item>
             <NavDropdown.Item href="/client/payfees">Pay Credit Fees</NavDropdown.Item>
         </NavDropdown>
+        <Nav.Link href="/client/profile">Your Client Profile</Nav.Link>
         </>
     )
 }
@@ -62,7 +63,7 @@ function Header() {
                     <img src="/refactorlogo.png" alt="logo" width={200}/>
                 </Navbar.Brand> */}
 
-                {state.authState ? <Navbar.Brand href="/dashboard" className='me-auto'>
+                {state.authUser.role === "client" ? <Navbar.Brand href="/dashboard" className='me-auto'>
                     <img src="/refactorlogo.png" alt="logo" width={200}/>
                 </Navbar.Brand> : <Navbar.Brand href="/" className='me-auto'>
                     <img src="/refactorlogo.png" alt="logo" width={200}/>
