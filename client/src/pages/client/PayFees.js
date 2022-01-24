@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from "axios";
 import { Card, Button, Row, Col } from "react-bootstrap";
 import { reqHeader } from "../../misc/reqHeader";
@@ -14,6 +14,7 @@ function PayFees() {
   const [fees, setFees] = useState("0.00");
   const [feesMap, setFeesMap] = useState([]);
   const params = useParams();
+  const byAccount = params.accountId ? true : false;
 
   useEffect(() => {
     axios
@@ -87,6 +88,16 @@ function PayFees() {
     ),
     originValue: Yup.number().required("The payment value is required."),
   });
+
+  if(!feesAccounts || feesAccounts.length === 0){
+    return (
+    <>
+      <h2>Congratulations! You have no fees to pay</h2>
+      {byAccount ? <Link to={`/client/accounts/${params.accountId}`}>Back to Account</Link>
+        : <Link to='/client/accounts'>Back to Accounts</Link>}
+      
+    </>)
+  }
 
   return (
     <Card className="col-7">
