@@ -13,13 +13,16 @@ function Users() {
   useEffect(() => {
       console.log("in use effect");
     axios
-      .get("/admin/allUsers?sort=" + sort, reqHeader)
-      .then((res) => setUserList(res.data.listOfUsers))
+      .get("/admins/allUsers?sort=" + sort, reqHeader)
+      .then((res) => {
+        setUserList(res.data.listOfUsers)
+        console.log(res.data);
+      })
       .catch((err) => console.log(err));
-  }, [sort]);
+  }, []);
 
   // useEffect(() => {
-  //     axios.get('/admin/approveUsers', reqHeader)
+  //     axios.get('/admins/approveUsers', reqHeader)
   //     .then(res => {
   //         setInactiveUsers(res.data.listOfUsers)
   //     })
@@ -28,7 +31,7 @@ function Users() {
 
   function activateUser(user) {
     axios
-      .put("/admin/enableUser", { userId: user.id }, reqHeader)
+      .put("/admins/enableUser", { userId: user.id }, reqHeader)
       .then((res) => {
         var newList = userList;
         newList[newList.indexOf(user)].activeStatus = "active";
@@ -40,7 +43,7 @@ function Users() {
 
   function disableUser(user) {
     axios
-      .post("/admin/disableUser", { userId: user.id }, reqHeader)
+      .post("/admins/disableUser", { userId: user.id }, reqHeader)
       .then((res) => {
         var newList = userList;
         newList[newList.indexOf(user)].activeStatus = "disabled";
@@ -81,7 +84,8 @@ function Users() {
           </Row>
         </Card.Header>
         <ListGroup>
-          {userList && userList.map((user) => {
+        {userList && userList.map((user) => {
+          {/* {userList.map((user) => { */}
             return (
               <ListGroup.Item
                 key={"user" + user.id}
@@ -98,7 +102,8 @@ function Users() {
           })}
         </ListGroup>
       </Card>
-      {userList.map((user) => {
+      {userList && userList.map((user) => {
+      {/* {userList.map((user) => { */}
         return (
           <Modal
             key={"userModal" + user.id}

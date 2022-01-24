@@ -79,7 +79,7 @@ function ApproveCheques() {
     if (approve !== "") {
       const body = { status: "cleared", chequeId: approve };
       axios
-        .put("/admin/approveCheque", body, reqHeader)
+        .put("/admins/approveCheque", body, reqHeader)
         .then((result) => {
           console.log(result);
           setSuccess(result.data);
@@ -98,7 +98,7 @@ function ApproveCheques() {
     if (deny !== "") {
       const body = { status: "denied", chequeId: deny };
       axios
-        .put("/admin/approveCheque", body, reqHeader)
+        .put("/admins/approveCheque", body, reqHeader)
         .then((result) => {
           console.log(result);
           setSuccess(result.data);
@@ -118,7 +118,7 @@ function ApproveCheques() {
 
   useEffect(() =>{
     axios
-    .get("/admin/approveCheques?page=" + page, reqHeader)
+    .get("/admins/approveCheques?page=" + page, reqHeader)
     .then((result) => {
       console.log(result.data);
       setChequesList(result.data.pageOfCheques);
@@ -192,7 +192,7 @@ function ApproveCheques() {
               <Row className="justify-content-md-center">
                 <Col>
                   <img
-                    src={`http://localhost:3001/admin/chequeImage/${chequeTransaction.chequeId}/${token}`}
+                    src={`/admins/chequeImage/${chequeTransaction.chequeId}/${token}`}
                     width="700px"
                   ></img>
                 </Col>

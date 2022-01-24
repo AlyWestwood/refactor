@@ -18,7 +18,7 @@ function Accounts() {
   const [alert, setAlert] = useState("");
 
   useEffect(() => {
-    axios.get('/admin/approveCreditAccounts', reqHeader)
+    axios.get('/admins/approveCreditAccounts', reqHeader)
     .then(res => {
       setAccounts(res.data.listOfInactiveCreditAccounts);
     })
@@ -32,7 +32,7 @@ function Accounts() {
   }
 
   function getApprovalForm(account){
-    axios.get(`/admin/totals/${account.userId}`, reqHeader)
+    axios.get(`/admins/totals/${account.userId}`, reqHeader)
     .then(res => {
       console.log(res.data)
       setFormAccount(account);
@@ -45,7 +45,7 @@ function Accounts() {
   function processAccount(status){
     form.status = status;
     console.log(form);
-    axios.put('/admin/approveCreditAccounts', form, reqHeader)
+    axios.put('/admins/approveCreditAccounts', form, reqHeader)
     .then(res => {
       setSuccess(res.data.message)
       setAccounts(accounts.filter(account => account.id !== formAccount.id));
