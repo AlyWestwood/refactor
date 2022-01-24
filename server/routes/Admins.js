@@ -248,6 +248,8 @@ router.put("/approveCreditAccounts", validateAdminToken, async (req, res) => {
     interestRate: interestRate,
     nextPaymentDueDate: date,
     activeStatus: status,
+    latePaymentFees: 0.00,
+    minimumPayment: 0.00
   };
 
   await Accounts.update(updateAccount, { where: { id: accountId } });
