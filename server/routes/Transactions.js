@@ -426,10 +426,11 @@ router.get("/cheques/:chequeId/:accessToken", async (req, res) => {
   const userId = validate.userId;
 
   const chequeId = req.params.chequeId;
-  const cheque = await db.sequelize.query("select b.userId as payeeUser, a.userId as payerUser from cheques join accounts a on cheques.payerAccount = a.id join accounts b on b.id = cheques.payeeAccount where cheques.id = ?;", { replacements: [chequeId] });
+  let cheque = await db.sequelize.query("select b.userId as payeeUser, a.userId as payerUser, cheque.id as chequeId from cheques join accounts a on cheques.payerAccount = a.id join accounts b on b.id = cheques.payeeAccount where cheques.id = ?;", { replacements: [chequeId] });
+  cheque = cheque[0];
   if (
     !cheque ||
-    (cheque.payerUser !== userId && cheque.payeeUser !== userId)
+    (cheque.payerUser != userId && cheque.payeeUser != userId)
   ) {
     return res.status(403).json({
       error: "User not authorized",
