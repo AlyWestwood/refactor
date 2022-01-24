@@ -3,14 +3,12 @@ import axios from "axios";
 import { reqHeader } from "../../misc/reqHeader";
 import { Card, ListGroup, Row, Col, Modal, Button } from "react-bootstrap";
 import { parseDateTime } from "../../misc/accountUtils";
-import { Navigate, useNavigate } from "react-router-dom";
 
 function Users() {
   const [userList, setUserList] = useState([]);
   const [showModal, setShowModal] = useState(false);
   // const [inactiveUsers, setInactiveUsers] = useState([]);
   const [sort, setSort] = useState("role");
-  const navigate = useNavigate();
 
   useEffect(() => {
       console.log("in use effect");
