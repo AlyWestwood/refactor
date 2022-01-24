@@ -132,7 +132,7 @@ function PayFees() {
                     className="form-select"
                     name="payerAccountId"
                   >
-                    {accountList.map((account) => {
+                    {accountList && accountList.map((account) => {
                       return (
                         <option
                           key={account.accountId}
@@ -159,7 +159,7 @@ function PayFees() {
                     className="form-select"
                     name="accountWithFees"
                   >
-                    {feesAccounts.map((feesAccount) => {
+                    {feesAccounts && feesAccounts.map((feesAccount) => {
                       return (
                         <option
                           key={feesAccount.accountId}

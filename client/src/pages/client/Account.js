@@ -16,7 +16,7 @@ function Account() {
     axios
       .get(`/accounts/singleAccount/${params.accountId}`, reqHeader)
       .then((res) =>{setAccount(res.data.account); console.log(account);} )
-      .catch((err) => alert(err.response.data.error));
+      .catch((err) => setAlert(err.response.data.error));
   }, [params.accountId]);
 
   useEffect(() => {

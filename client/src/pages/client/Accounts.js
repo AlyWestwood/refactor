@@ -52,7 +52,7 @@ function Accounts() {
         </Nav>
         <h1 className='text-start'>Accounts Overview</h1>
         <Col lg={9}>
-            {accountList.map(account => {
+            {accountList && accountList.map(account => {
                 if(account.activeStatus === 'inactive'){
                     return <InactiveAccount key={'account' + account.id} account ={account} />
                 }

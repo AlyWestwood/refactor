@@ -142,7 +142,7 @@ function Deposit() {
                       {singleAccount.accountType}
                     </option>
                   )}
-                  {accountList.map((account) => {
+                  {accountList && accountList.map((account) => {
                     return (
                       <option key={account.accountId} value={account.accountId}>
                         Account #{account.accountId} - {account.currency}{" "}

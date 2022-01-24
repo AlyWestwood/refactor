@@ -83,7 +83,7 @@ function Accounts() {
                 <th>Currency</th>
               </thead>
               <tbody>
-          {accounts.map(account => {
+          {accounts && accounts.map(account => {
             return(
                 <tr onClick={() => getApprovalForm(account)} key={'application' + account.id}>
                   <td>{account.userId}</td>

@@ -81,7 +81,7 @@ function Users() {
           </Row>
         </Card.Header>
         <ListGroup>
-          {userList.map((user) => {
+          {userList && userList.map((user) => {
             return (
               <ListGroup.Item
                 key={"user" + user.id}

@@ -4,7 +4,7 @@ const { Users } = require("../models");
 const { Accounts } = require("../models");
 const { validateToken, validateAdminToken } = require("../misc/authware");
 const { exchangeCurrency } = require("../utils/utils");
-const Op = require("Sequelize").Op;
+const Op = require("sequelize").Op;
 /**
  * Returns the logged in user's accounts
  */
