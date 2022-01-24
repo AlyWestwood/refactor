@@ -17,7 +17,7 @@ function Deposit() {
     top: "50%",
     left: "43%",
     height: "100px",
-    "margin-top": "-50px",
+    "marginTop": "-50px",
   }
   // const tempData = {
   //   payeeAccountId: 3,
@@ -88,8 +88,8 @@ function Deposit() {
         },
       })
       .then((result) => {
-        console.log(result);
-        setSuccess(result);
+        console.log(result.data);
+        setSuccess("Cheque deposited, awaiting approval.");
       })
       .catch((err) => {
         setAlert(err.response.data);
