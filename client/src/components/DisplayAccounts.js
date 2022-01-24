@@ -45,7 +45,7 @@ function DisplayAccounts({account}){
                                     {assignTransaction(transaction, account.id)}
                             </ListGroup.Item>
                             )})}
-                            <ListGroup.Item><div className='text-primary text-decoration-underline'>More Account Details</div></ListGroup.Item>
+                            <ListGroup.Item><div className='text-primary'>{transactionList.length} total transactions</div></ListGroup.Item>
                 </ListGroup>}
         </Card>
         </>
