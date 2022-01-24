@@ -28,6 +28,7 @@
   import PayFees from './pages/client/PayFees';
   import RecurringPayment from './pages/client/RecurringPayment';
   import NewRecurringPayment from './pages/client/NewRecurringPayment';
+  import Profile from './pages/client/Profile';
 
   /* admin pages */
   import AdminAccounts from './pages/admin/Accounts';
@@ -59,6 +60,7 @@ function App() {
             <Route path="register" element={<Register/>}/>
             <Route path="fileUpload" element={<FileUpload/>}/>
             <Route path="displayCheque" element={<DisplayCheque/>}/>
+            <Route path="dashboard" element={<Home/>}/>
         {/* client routes */}
             <Route path="client" element={<Client/>}>
               <Route path="" element={<ClientHome/>}/>
@@ -82,6 +84,7 @@ function App() {
                 <Route path="transfer" element={<NewTransfer/>}>
                   <Route path=":accountId" element={<NewTransfer/>}/>
                 </Route>
+                <Route path="profile" element={<Profile/>}/>
             </Route>
 
         {/* admin routes */}

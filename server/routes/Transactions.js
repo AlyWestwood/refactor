@@ -51,9 +51,24 @@ router.get("/byAccountPage/:accountId", validateToken, async (req, res) => {
 });
 
 
-// router.get("/charts/cashFlow", validateToken, async (req, res) => {
-//   const userId = 
-// })
+router.get("/charts/cashFlow", validateToken, async (req, res) => {
+  const userId = req.userId;
+  console.log(userId);
+  const paidValue = await db.sequelize.query("select sum(originValue) as totalPaid from transactions join accounts on accounts.id = payerAccount where month(transactionDate) = month(current_timestamp())  and transactions.status ='accepted' and userId = ?;", {replacements: [userId]})
+  // paidTransactions[0]
+  const incomeValue = await db.sequelize.query("select sum(targetValue) as totalIncome from transactions join accounts on accounts.id = payeeAccount where month(transactionDate) = month(current_timestamp())  and transactions.status ='accepted' and userId = ?;", {replacements: [userId]})
+
+  return res.json({paidValue: paidValue[0], incomeValue: incomeValue[0]});
+})
+
+
+router.get("/charts/dailyTransactions", validateToken, async (req, res) => {
+  const userId = req.userId;
+  console.log(userId);
+  const transactions = await db.sequelize.query("select count(transactions.id) as count, transactionDate from transactions join accounts a on a.id = payerAccount join accounts b on b.id = payeeAccount where month(transactionDate) = month(current_timestamp()) and (a.userId = ? or b.userId = ?) group by transactionDate;", {replacements: [userId, userId]})
+  console.log(transactions[0]);
+  return res.json(transactions[0]);
+})
 
 /**
  * gets transactions of specific account after verifying account can be accessed by logged in user
@@ -75,8 +90,6 @@ router.get("/byAccount/:accountId", validateToken, async (req, res) => {
 
   res.json(listOfTransactions);
 });
-
-
 
 /**
  * gets single transaction
