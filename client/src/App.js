@@ -59,6 +59,7 @@ function App() {
             <Route path="register" element={<Register/>}/>
             <Route path="fileUpload" element={<FileUpload/>}/>
             <Route path="displayCheque" element={<DisplayCheque/>}/>
+            <Route path="dashboard" element={<Home/>}/>
         {/* client routes */}
             <Route path="client" element={<Client/>}>
               <Route path="" element={<ClientHome/>}/>

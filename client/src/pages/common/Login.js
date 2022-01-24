@@ -24,7 +24,7 @@ function Login() {
         localStorage.setItem("accessToken", res.data.token);
         setAuthState(true);
         setAuthUser(res.data.user);
-        navigate('/');
+        navigate('/dashboard');
       }
     }).catch(err => {
       alert(err.response.data.error)

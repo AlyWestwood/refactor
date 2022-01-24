@@ -58,9 +58,16 @@ function Header() {
     return (
         <header>
             <Navbar bg="primary" className="p-3">
-                <Navbar.Brand href="/" className='me-auto'>
+                {/* <Navbar.Brand href="/" className='me-auto'>
                     <img src="/refactorlogo.png" alt="logo" width={200}/>
-                </Navbar.Brand>
+                </Navbar.Brand> */}
+
+                {state.authState ? <Navbar.Brand href="/dashboard" className='me-auto'>
+                    <img src="/refactorlogo.png" alt="logo" width={200}/>
+                </Navbar.Brand> : <Navbar.Brand href="/" className='me-auto'>
+                    <img src="/refactorlogo.png" alt="logo" width={200}/>
+                </Navbar.Brand>}
+
                 {/* <Nav> */}
                 {state.authState ? <LoggedIn /> : <LoggedOut/>}
                 {/* </Nav> */}
