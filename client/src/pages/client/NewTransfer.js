@@ -7,9 +7,19 @@ import { Formik, Field, ErrorMessage, Form } from "formik";
 import * as Yup from "yup";
 
 function NewTransfer() {
+
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "43%",
+    height: "100px",
+    "marginTop": "-50px",
+  }
+
   const [accountList, setAccountList] = useState([]);
   const [alert, setAlert] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   const params = useParams();
   
   useEffect(() => {
@@ -34,9 +44,10 @@ function NewTransfer() {
 
 
 
-  const onSubmit = (data, { resetForm }) => {
+  const onSubmit = async (data, { resetForm }) => {
     setAlert("");
     setSuccess("");
+    setLoading(true);
     console.log(data);
     axios
       .post("/transactions/transferFunds", data, reqHeader)
@@ -44,10 +55,12 @@ function NewTransfer() {
         console.log(response);
         setSuccess("Transfered Successfully");
         resetForm();
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error.response.data);
         setAlert(error.response.data);
+        setLoading(false);
       });
   };
 
@@ -73,6 +86,13 @@ function NewTransfer() {
         <div className="alert alert-success" role="alert">
           {success}
         </div>
+      )}
+            {loading && (
+        <img
+          src={require("../../resources/loading.gif")}
+          alt="loading..."
+         style={style}
+        />
       )}
       <Card.Body>
         <Formik

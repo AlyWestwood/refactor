@@ -14,8 +14,8 @@ function assignTransaction(transaction, accountId){
     
 
     return fundsIn ? 
-        <><Row><Col className='text-start'>{parseDateTime(transaction.createdAt)} : received from #{transaction.payerAccount}</Col><Col sm={3} className='text-end'>{symbol}{transaction.targetValue} {transaction.targetCurrency}</Col></Row></> :
-        <><Row><Col className='text-start'>{parseDateTime(transaction.createdAt)} : paid to #{transaction.payeeAccount}</Col><Col sm={3} className='text-end'>-{symbol}{transaction.originValue} {transaction.originCurrency}</Col></Row></> ;
+        <><Row><Col className='text-start'>{parseDateTime(transaction.createdAt)} : received from #{transaction.payerAccount}</Col><Col sm={3} className='text-end text-success'>{transaction.status !== "accepted" ? <span className="badge bg-light text-secondary">{transaction.status}</span> :<></>}{symbol}{transaction.targetValue} {transaction.targetCurrency}</Col></Row></> :
+        <><Row><Col className='text-start'>{parseDateTime(transaction.createdAt)} : paid to #{transaction.payeeAccount}</Col><Col sm={3} className='text-end '>{transaction.status !== "accepted" ? <span className="badge bg-light text-secondary">{transaction.status}</span> :<></>}({symbol}{transaction.originValue} {transaction.originCurrency})</Col></Row></> ;
 }
 
 // function assignRecurring(recurring, accountId){

@@ -32,7 +32,7 @@ const cors = require('cors');
   
   app.use("/transactions", transactionsRouter);
   app.use("/users", usersRouter);
-  app.use("/admin", adminsRouter);
+  app.use("/admins", adminsRouter);
   app.use("/accounts", accountsRouter);
   
   app.use(express.static("./build"));
