@@ -173,6 +173,8 @@ function DisplayAccount({account}){
                     </Table>
                 </Modal.Body>
             </Modal>
+        
+        
         )})}
 
         <Modal
@@ -181,7 +183,7 @@ function DisplayAccount({account}){
                 onHide = {() => setCheque(false)}
                 centered
                 >
-            <img src={`http://localhost:3001/transactions/cheques/${cheque}/${accessToken}`} alt='cheque'/>
+            <img src={`/transactions/cheques/${cheque}/${accessToken}`} alt='cheque'/>
         </Modal>
         </>
     )
