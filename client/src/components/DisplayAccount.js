@@ -18,6 +18,7 @@ function DisplayAccount({account}){
     const [page, setPage] = useState(0);
     const [cheque, setCheque] = useState(false);
     const navigate = useNavigate();
+    const accessToken = localStorage.getItem('accessToken');
     
     const currency = getSymbol(account.currency)
 
@@ -180,7 +181,7 @@ function DisplayAccount({account}){
                 onHide = {() => setCheque(false)}
                 centered
                 >
-            <img src={`/transactions/cheques/${cheque}/${localStorage.getItem('accessToken')}`} alt='cheque'/>
+            <img src={`http://localhost:3001/transactions/cheques/${cheque}/${accessToken}`} alt='cheque'/>
         </Modal>
         </>
     )

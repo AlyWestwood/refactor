@@ -5,7 +5,6 @@ const db = require("../models/index");
 const sgMail = require("@sendgrid/mail");
 const { exchangeCurrency } = require("../utils/utils");
 const { Op } = require("sequelize");
-const { Account } = require("aws-sdk");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 function cron() {
@@ -234,7 +233,7 @@ function email(to, firstName, lastName, message, warning) {
   });
   const msg = {
     to: to,
-    name: firstName + " " + lastName, // Change to your recipient
+    name: firstName + " " + lastName, 
     from: process.env.SENDGRID_SENDER_EMAIL,
     template_id: process.env.SENDGRID_TEMPLATE,
     dynamic_template_data: {
@@ -243,9 +242,6 @@ function email(to, firstName, lastName, message, warning) {
       warning: warning,
     },
   };
-
-  console.log(msg);
-
   sgMail
     .send(msg)
     .then((response) => {

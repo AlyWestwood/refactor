@@ -198,7 +198,7 @@ function PayFees() {
                     className="form-control"
                     type="number"
                     name="originValue"
-                    placeholder="Amount to be withdrawn"
+                    placeholder="Amount to pay"
                     min="1"
                     step=".01"
                   />

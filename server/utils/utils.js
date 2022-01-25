@@ -13,61 +13,55 @@ AWS.config.update({
 // Create S3 service object
 var s3 = new AWS.S3({ apiVersion: "2006-03-01" });
 
-async function uploadCheque(path) {
-  return await new Promise((resolve, reject) => {
+function uploadCheque(path) {
+  return new Promise((resolve, reject) => {
     const buffer = fs.readFileSync(path);
-    let type = "jpg";
     detect.fromBuffer(buffer, (err, result) => {
       type = result.ext;
       const fileName = `cheques/${Date.now().toString()}`;
       uploadToS3(buffer, fileName, type).then((result) => {
         console.log(result);
         resolve(result);
+      }).catch((err) =>{
+        reject(err);
       });
     });
   });
 }
 
-async function downloadCheque(chequeId) {
+ function downloadCheque(chequeId) {
   return new Promise((resolve, reject) => {
     Cheques.findByPk(chequeId)
       .then((result1) => {
         downloadFromS3(result1.s3key)
           .then((result2) => {
-            console.log("result2");
-            console.log(result2);
             resolve(result2);
           })
           .catch((error) => {
-            console.log("error" + error);
-            reject(err);
+            reject(error);
           });
       })
       .catch((err) => {
-        console.log("err: " + err);
         reject(err);
       });
   });
 }
 
-const downloadFromS3 = async (key) => {
+const downloadFromS3 = (key) => {
   const downloadParams = {
     Bucket: process.env.S3BUCKET,
     Key: key,
   };
-
-  return await s3.getObject(downloadParams).promise();
+  return s3.getObject(downloadParams).promise();
 };
 
-const uploadToS3 = async (buffer, name, type) => {
+const uploadToS3 = (buffer, name, type) => {
   const uploadParams = {
     Bucket: process.env.S3BUCKET,
     Key: name + "." + type,
     Body: buffer,
   };
-
-  // call S3 to retrieve upload file to specified bucket
-  return await s3.upload(uploadParams).promise();
+  return s3.upload(uploadParams).promise();
 };
 
 const exchangeCurrency = async (originCurrency, targetCurrency, value) => {

@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, ListGroup, Row, Col, Modal, Button } from "react-bootstrap";
@@ -20,57 +21,20 @@ function ApproveCheques() {
     }
     let pages = [];
     if (paginate.currentPage > 1) {
-      pages.push(
-        <li className="page-item">
-          <a className="page-link" onClick={() => {setPage(paginate.currentPage - 1);}}>
-            Previous
-          </a>
-        </li>
-      );
+      pages.push(<li className="page-item"><a className="page-link" onClick={() => {setPage(paginate.currentPage - 1);}}> Previous</a></li>);
     } else {
-      pages.push(
-        <li className="page-item disabled">
-          <a className="page-link " onClick={() => {setPage(paginate.currentPage - 1);}}>
-            Previous
-          </a>
-        </li>
-      );
+      pages.push( <li className="page-item disabled"><a className="page-link " onClick={() => {setPage(paginate.currentPage - 1);}}>Previous</a></li>);
     }
     for (let i = 1; i < paginate.totalPages + 1; i++) {
       if (i === paginate.currentPage) {
-        pages.push(
-          <li className="page-item active">
-            <a className="page-link" onClick={() => {setPage(i);}}>
-              {i}
-            </a>
-          </li>
-        );
+        pages.push(<li className="page-item active"><a className="page-link" onClick={() => {setPage(i);}}>{i}</a></li> );
       } else {
-        pages.push(
-          <li className="page-item">
-            <a className="page-link" onClick={() => {setPage(i);}}>
-              {i}
-            </a>
-          </li>
-        );
-      }
+        pages.push(<li className="page-item"><a className="page-link" onClick={() => {setPage(i);}}>{i}</a> </li>);}
     }
     if (paginate.currentPage !== paginate.endPage) {
-      pages.push(
-        <li className="page-item">
-          <a className="page-link"  onClick={() => {setPage(Number(paginate.currentPage) + 1);}}>
-            Next
-          </a>
-        </li>
-      );
+      pages.push(<li className="page-item"> <a className="page-link"  onClick={() => {setPage(Number(paginate.currentPage) + 1);}}>Next</a></li>);
     } else {
-      pages.push(
-        <li className="page-item disabled">
-          <a className="page-link " onClick={() => {setPage(Number(paginate.currentPage) + 1);}}>
-            Next
-          </a>
-        </li>
-      );
+      pages.push(<li className="page-item disabled"> <a className="page-link " onClick={() => {setPage(Number(paginate.currentPage) + 1);}}> Next</a> </li>);
     }
     return <ul className="pagination m-3 justify-content-center">{pages}</ul>;
   }
@@ -193,10 +157,7 @@ function ApproveCheques() {
             <Modal.Body>
               <Row className="justify-content-md-center">
                 <Col>
-                  <img
-                    src={`/admins/chequeImage/${chequeTransaction.chequeId}/${token}`}
-                    width="700px"
-                  ></img>
+                  <img src={`http://localhost:3001/admins/chequeImage/${chequeTransaction.chequeId}/${token}`} width="700px" alt="cheque"></img>
                 </Col>
                 <Col>
                   <ListGroup>

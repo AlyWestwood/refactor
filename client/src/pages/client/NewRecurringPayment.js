@@ -143,14 +143,17 @@ function NewRecurringPayment() {
               <Col>
                 <div className="form-group">
                   <label className="form-label">Value</label>
+                  <div className="input-group">
+                  <span className="input-group-text" id="basic-addon1">$</span>
                   <Field
                     className="form-control"
                     type="number"
                     name="originValue"
-                    placeholder="Amount to be withdrawn in the currency of the original account"
+                    placeholder="Amount to be withdrawn"
                     min="1"
                     step=".01"
                   />
+                  </div>
                 </div>
                 <ErrorMessage
                   className="text-danger"
