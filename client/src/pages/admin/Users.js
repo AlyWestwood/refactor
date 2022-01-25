@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { reqHeader } from "../../misc/reqHeader";
-import { Card, ListGroup, Row, Col, Modal, Button } from "react-bootstrap";
+import { Card, ListGroup, Row, Col, Modal, Button, Alert } from "react-bootstrap";
 import { parseDateTime } from "../../misc/accountUtils";
 
 function Users() {
   const [userList, setUserList] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [alert, setAlert] = useState("");
+  const [success, setSuccess] = useState("");
+
   // const [inactiveUsers, setInactiveUsers] = useState([]);
   const [sort, setSort] = useState("role");
 
@@ -37,8 +40,12 @@ function Users() {
         newList[newList.indexOf(user)].activeStatus = "active";
         setUserList(newList);
         setShowModal(false);
+        setSuccess('User account successfully activated')
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setAlert("There was a problem with your request")
+      });
   }
 
   function disableUser(user) {
@@ -49,8 +56,12 @@ function Users() {
         newList[newList.indexOf(user)].activeStatus = "disabled";
         setUserList(newList);
         setShowModal(false);
+        setSuccess("User account disabled")
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setAlert("There was a problem with your request");
+      });
   }
 
   return (
@@ -59,6 +70,17 @@ function Users() {
         <Col>
           <h1>Users</h1>
         </Col>
+        {alert && (
+              <Alert variant='danger' onClose={() => setAlert("")} dismissible>
+              {alert}
+              </Alert>
+          )}
+          {success && (
+              <Alert variant='success' onClose={() => setSuccess("")} dismissible>
+              {success}
+              </Alert>
+          )}
+
         <Col className="col-4">
             <label>Sort By</label>
           <select className="form-select" onChange={(e) => {
