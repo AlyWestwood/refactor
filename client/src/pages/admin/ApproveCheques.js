@@ -130,6 +130,7 @@ function ApproveCheques() {
 
   return (
     <div>
+      <h1>Approve Cheques</h1>
       <Card className="col-10">
         <Card.Header>Cheques requiring approval</Card.Header>
         {alert && (
@@ -156,6 +157,7 @@ function ApproveCheques() {
               return (
                 <ListGroup.Item
                   key={cheque.chequeId}
+                  action
                   onClick={() => {
                     setShowModal(cheque.chequeId);
                   }}

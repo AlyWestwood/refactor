@@ -68,7 +68,7 @@ function Users() {
     <>
       <Row>
         <Col>
-          <h1>Users</h1>
+          <h1>Approve Users</h1>
         </Col>
         {alert && (
               <Alert variant='danger' onClose={() => setAlert("")} dismissible>
@@ -110,6 +110,7 @@ function Users() {
             return (
               <ListGroup.Item
                 key={"user" + user.id}
+                action
                 onClick={() => setShowModal(user.id)}
               >
                 <Row>

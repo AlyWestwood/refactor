@@ -123,7 +123,7 @@ function PayFees() {
               }
             }}
           >
-            <Row>
+            <Row className='mb-3'>
               <Col>
                 <div className="form-group">
                   <label className="form-label">From Account</label>
@@ -180,7 +180,7 @@ function PayFees() {
                 />
               </Col>
             </Row>
-            <Row>
+            <Row className='mb-3'>
               <Col>
                 <div className="form-group">
                   <label className="form-label">Late Payment Fees</label>

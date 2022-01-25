@@ -102,6 +102,7 @@ function DisplayAccount({account}){
                     return (
                         <ListGroup.Item 
                             key={'transaction'+transaction.id} 
+                            action
                             onClick={() =>{
                                 setShowModal(transaction.id)
                             }}>

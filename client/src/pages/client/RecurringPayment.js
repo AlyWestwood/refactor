@@ -59,7 +59,7 @@ function RecurringPayment() {
             <Card.Body>
                 {flashMessage &&
                 <Card.Text>{flashMessage}</Card.Text>}
-            <Table>
+            <Table hover>
                 <thead>
                     <th>From Account</th>
                     <th>To Account #</th>
@@ -79,7 +79,7 @@ function RecurringPayment() {
                     <td><Button variant='danger' onClick={() => setShowDelete(recurring.id)}>Cancel</Button></td>
                 </tr>
                 )
-            }): <tr><td>{recurringList}</td></tr>}
+            }): <tr>{recurringList}</tr>}
                 </tbody>
             </Table>
             </Card.Body>

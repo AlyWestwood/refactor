@@ -59,7 +59,7 @@ function Accounts() {
 
   return (
       <>
-        <h1>Awaiting Approval</h1>
+        <h1>Approve Accounts</h1>
         {alert && (
             <Alert variant='danger' onClose={() => setAlert("")} dismissible>
             {alert}
@@ -73,10 +73,10 @@ function Accounts() {
 
         <Card>
           <Card.Header>
-            &nbsp;
+            Accounts requiring approval
           </Card.Header>
           <Card.Body>
-            <Table>
+            <Table hover>
               <thead>
                 <th>Client ID #</th>
                 <th>Date of application</th>
