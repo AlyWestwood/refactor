@@ -5,7 +5,7 @@ import React, { useState, useContext } from "react";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../misc/AuthContext";
-import { Form, Card, Button } from 'react-bootstrap';
+import { Form, Card, Button, Alert } from 'react-bootstrap';
 
 
 function Login() {
@@ -13,6 +13,9 @@ function Login() {
   const { setAuthState, setAuthUser } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [alert, setAlert] = useState("");
+  const [success, setSuccess] = useState("");
+
 
   /* This will be different from the blog auth context because we will include the user role */
   const login = () => {
@@ -27,7 +30,7 @@ function Login() {
         navigate('/dashboard');
       }
     }).catch(err => {
-      alert(err.response.data.error)
+      setAlert(err.response.data.error)
     });
   };
   return (
@@ -35,6 +38,17 @@ function Login() {
     <Card className='col-5'>
       <Card.Header>Log In</Card.Header>
       <Card.Body>
+        {alert && (
+            <Alert variant='danger' onClose={() => setAlert("")} dismissible>
+            {alert}
+            </Alert>
+        )}
+        {success && (
+            <Alert variant='success' onClose={() => setSuccess("")} dismissible>
+            {success}
+            </Alert>
+        )}
+
         <Form>
           <Form.Group controlId='email' className='mb-3'>
             <Form.Label>Email</Form.Label>
