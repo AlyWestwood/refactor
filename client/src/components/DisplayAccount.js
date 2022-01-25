@@ -180,7 +180,7 @@ function DisplayAccount({account}){
                 onHide = {() => setCheque(false)}
                 centered
                 >
-            <img src={`http://localhost:3001/transactions/cheques/${cheque}/${localStorage.getItem('accessToken')}`} alt='cheque'/>
+            <img src={`/transactions/cheques/${cheque}/${localStorage.getItem('accessToken')}`} alt='cheque'/>
         </Modal>
         </>
     )
