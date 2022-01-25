@@ -85,7 +85,6 @@ function Users() {
         </Card.Header>
         <ListGroup>
         {userList && userList.map((user) => {
-          {/* {userList.map((user) => { */}
             return (
               <ListGroup.Item
                 key={"user" + user.id}
@@ -103,7 +102,6 @@ function Users() {
         </ListGroup>
       </Card>
       {userList && userList.map((user) => {
-      {/* {userList.map((user) => { */}
         return (
           <Modal
             key={"userModal" + user.id}

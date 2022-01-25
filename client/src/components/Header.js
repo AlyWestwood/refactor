@@ -5,11 +5,11 @@ import {Navbar, Nav, NavDropdown} from 'react-bootstrap';
 
 /* PIMARY HEADER */
 
-function LoggedIn(){
+function LoggedIn({role}){
     // const navigate = Navigate()
     return (
         <>
-        <Nav.Link href="/client/profile" className='headerbtn'>Your Client Profile</Nav.Link>
+        {role === 'client' && <Nav.Link href="/client/profile" className='headerbtn'>Your Client Profile</Nav.Link>}
         <Nav.Link href="/logout" className='headerbtn'>Log Out</Nav.Link>
         </>
         )
@@ -65,14 +65,14 @@ function Header() {
                     <img src="/refactorlogo.png" alt="logo" width={200}/>
                 </Navbar.Brand> */}
 
-                {state.authUser.role === "client" ? <Navbar.Brand href="/dashboard" className='me-auto'>
+                {state.authUser.role ? <Navbar.Brand href="/dashboard" className='me-auto'>
                     <img src="/refactorlogo.png" alt="logo" width={200}/>
                 </Navbar.Brand> : <Navbar.Brand href="/" className='me-auto'>
                     <img src="/refactorlogo.png" alt="logo" width={200}/>
                 </Navbar.Brand>}
 
                 {/* <Nav> */}
-                {state.authState ? <LoggedIn /> : <LoggedOut/>}
+                {state.authState ? <LoggedIn role={state.authUser.role} /> : <LoggedOut/>}
                 {/* </Nav> */}
             </Navbar>
             <Navbar bg="secondary" expand="lg" variant="dark">

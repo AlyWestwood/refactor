@@ -23,7 +23,6 @@
   import Account from './pages/client/Account';
   import NewAccountC from './pages/client/NewAccount';
   import Deposit from './pages/client/Deposit';
-  import Transactions from './pages/client/Transactions';
   import NewTransfer from './pages/client/NewTransfer';
   import PayFees from './pages/client/PayFees';
   import RecurringPayment from './pages/client/RecurringPayment';
@@ -32,7 +31,6 @@
 
   /* admin pages */
   import AdminAccounts from './pages/admin/Accounts';
-  import NewAccountA from './pages/admin/NewAccount';
   import TransferA from './pages/admin/Transfer';
   import Users from './pages/admin/Users';
   import ApproveCheques from './pages/admin/ApproveCheques';

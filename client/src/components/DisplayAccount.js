@@ -161,7 +161,7 @@ function DisplayAccount({account}){
                                 <td>{transaction.recurringPaymentId ? 'Yes' : 'No'}</td>
                             </tr>
                             {transaction.recurringPaymentId &&
-                                <Button variant='outline-primary' className='mt-3'>Stop this payment</Button> 
+                                <Button variant='outline-primary' className='mt-3'>Stop this recurring payment</Button> 
                             }
                         </tbody>
                     </Table>
