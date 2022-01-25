@@ -7,6 +7,9 @@ import axios from 'axios';
 import { Card, ListGroup, Row, Col, Modal, Table, Button } from 'react-bootstrap';
 import { reqHeader } from '../misc/reqHeader';
 import { assignTransaction, getSymbol, parseDateTime } from '../misc/accountUtils';
+import { useNavigate } from 'react-router-dom';
+
+
 
 function DisplayAccount({account}){
     const [transactionList, setTransactionList] = useState([]);
@@ -14,6 +17,7 @@ function DisplayAccount({account}){
     const [paginate, setPaginate] = useState("");
     const [page, setPage] = useState(0);
     const [cheque, setCheque] = useState(false);
+    const navigate = useNavigate();
     
     const currency = getSymbol(account.currency)
 
@@ -162,7 +166,7 @@ function DisplayAccount({account}){
                                 <td>{transaction.recurringPaymentId ? 'Yes' : 'No'}</td>
                             </tr>
                             {transaction.recurringPaymentId &&
-                                <Button variant='outline-primary' className='mt-3'>Stop this recurring payment</Button> 
+                                <Button variant='outline-primary' className='mt-3' onClick={() => navigate(`/client/recurringpayment/${transaction.payerAccount}`)}>View Payment Schedule</Button> 
                             }
                         </tbody>
                     </Table>
