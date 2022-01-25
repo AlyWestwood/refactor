@@ -24,17 +24,17 @@ footer {
 
 #homebanner {
   background-image: url('../public/homebanner.png');
-  background-size: 90vw auto;
+  background-size: 100% auto;
   background-position: center top;
   background-repeat: no-repeat;
   margin: 0;
   padding: 0;
   width: 90vw;
-  height: 40vh;
-  position: relative;
+  height: 25vw;
+  /* position: absolute; */
   overflow: visible;
-  
 }
+
 
 .adimage{
   width: 300px;
