@@ -157,7 +157,7 @@ function ApproveCheques() {
             <Modal.Body>
               <Row className="justify-content-md-center">
                 <Col>
-                  <img src={`http://localhost:3001/admins/chequeImage/${chequeTransaction.chequeId}/${token}`} width="700px" alt="cheque"></img>
+                  <img src={`/admins/chequeImage/${chequeTransaction.chequeId}/${token}`} width="700px" alt="cheque"></img>
                 </Col>
                 <Col>
                   <ListGroup>
