@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from "react";
-import DonutChart from "../../components/DonutChart";
-import LineChart from "../../components/LineChart";
-import { Row, Col } from "react-bootstrap";
+import React from 'react';
+import { Row, Col } from 'react-bootstrap';
 
 function Home() {
   return (
-    <div className="row justify-content-center ">
-      <h3 className="m-4">Your data at a glance</h3>
-        <Col>
-        <DonutChart />
-        </Col>
-        <Col>
-        <LineChart />
-        </Col>
-    </div>
+    <>
+        <div id='homebanner'></div>
+        <Row className='justify-content-md-center'>
+            <a className='adimage justify-content-md-center' id='planfuture' href='/register'></a>
+            <a className='adimage' md='auto' id='getcheques' href='/register'></a>
+            <a className='adimage justify-content-md-center' id='applycard' href='/register'></a>
+        </Row>
+    </>
   );
 }
 

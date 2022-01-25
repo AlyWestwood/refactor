@@ -9,6 +9,7 @@
   import './bootstrap.scss';
   import './App.css';
   import Home from './pages/common/Home';
+  import Dashboard from './pages/common/Dashboard';
   import { Login, Logout } from './pages/common/Login';
   import Register from './pages/common/Register.js';
   import GetAuth from './misc/GetAuth';
@@ -52,13 +53,13 @@ function App() {
         {/* common routes */}
 
           <Route path="/" element={<Layout />}>
-            <Route path="home" element={<Home/>}/>
+            <Route path="" element={<Home/>}/>
             <Route path="login" element={<Login/>}/>
             <Route path="logout" element={<Logout/>}/>
             <Route path="register" element={<Register/>}/>
             <Route path="fileUpload" element={<FileUpload/>}/>
             <Route path="displayCheque" element={<DisplayCheque/>}/>
-            <Route path="dashboard" element={<Home/>}/>
+            <Route path="dashboard" element={<Dashboard/>}/>
         {/* client routes */}
             <Route path="client" element={<Client/>}>
               <Route path="" element={<ClientHome/>}/>
