@@ -144,7 +144,7 @@ function Accounts() {
                   </Col>     
                   <Col>
                   <Form.Label>Interest Rate %</Form.Label>
-                    <Form.Control type='number' defaultValue='0.19' step={0.01} onChange={e => setForm({...form, interestRate : e.target.value})}/>
+                    <Form.Control type='number' defaultValue='19.59' step={0.001} onChange={e => setForm({...form, interestRate : e.target.value})}/>
                   </Col>
                 </Row>
                 <Row className='mb-3 text-center'>

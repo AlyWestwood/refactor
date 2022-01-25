@@ -148,6 +148,12 @@ router.get("/chequeImage/:chequeId/:token", async (req, res) => {
       console.log("err" + err);
       res.status(400).json(err);
     });
+
+//   const cheque = await downloadCheque(chequeId);
+// console.log(cheque);
+//   if(cheque){
+//     res.header("Content-Type", "image/jpeg").send(cheque.body);
+//   }
 });
 
 
@@ -160,17 +166,11 @@ router.get("/approveCheques", validateAdminToken, async (req, res) => {
     return res.status(400).json("No Cheques");
   }
   const page = parseInt(req.query.page) || 1;
-
   const pageSize = 4;
   const pager = paginate(chequeList[0].length, page, pageSize);
-
   const pageOfCheques = chequeList[0].slice(pager.startIndex, pager.endIndex + 1);
-  
-
 
   return res.json({pager, pageOfCheques});
-
-
 })
 
 

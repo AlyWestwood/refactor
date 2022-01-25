@@ -430,21 +430,20 @@ router.post("/transferFunds", validateToken, async (req, res) => {
 router.get("/cheques/:chequeId/:accessToken", async (req, res) => {
   // const userId = req.userId;
   const accessToken = req.params.accessToken;
-  const validate = await validateTokenDirect(accessToken).catch((err) => {
-    console.log(err);
-  });
-  if (!validate) {
+  const validate = await validateTokenDirect(accessToken);
+
+  console.log(validate.success);
+  if (!validate.success) {
     return res.status(403).json("user not auth");
   }
   const userId = validate.userId;
 
   const chequeId = req.params.chequeId;
-  let cheque = await db.sequelize.query("select b.userId as payeeUser, a.userId as payerUser, cheques.id as chequeId from cheques join accounts a on cheques.payerAccount = a.id join accounts b on b.id = cheques.payeeAccount where cheques.id = ?;", { replacements: [chequeId] });
-  // cheque = cheque[0];
-  if (
-    !cheque ||
-    (cheque.payerUser != userId && cheque.payeeUser != userId)
-  ) {
+  console.log(chequeId);
+  console.log(userId);
+  let cheque = await db.sequelize.query("select b.userId as payeeUser, a.userId as payerUser, cheques.id as chequeId from cheques join accounts a on cheques.payerAccount = a.id join accounts b on b.id = cheques.payeeAccount where cheques.id = 14;", { replacements: [chequeId] });
+  console.log(cheque);
+  if (cheque[0][0].payeeUser !== userId && cheque[0][0].payerUser !== userId) {
     return res.status(403).json({
       error: "User not authorized",
       cheque: cheque,
@@ -468,8 +467,7 @@ router.get("/cheques/:chequeId/:accessToken", async (req, res) => {
       res.header("Content-Type", "image/jpeg").send(result.Body);
     })
     .catch((err) => {
-      console.log("after download cheque");
-      console.log("err" + err);
+      console.log(err);
       res.status(400).json(err);
     });
 });
@@ -508,14 +506,6 @@ router.post("/depositCheque", validateToken, async (req, res) => {
   const uploadResult = await uploadCheque(request.path);
   const { payeeAccountId, payerAccountId, value, chequeNumber } =
     request.fields;
-
-  // const tempData = {
-  //   payeeAccountId: 3,
-  //   payerAccountId: 2,
-  //   value: 10,
-  //   chequeNumber: 265,
-  // };
-  // const { payeeAccountId, payerAccountId, value, chequeNumber } = tempData;
 
   const targetAccount = await Accounts.findOne({
     where: { id: payeeAccountId, userId: userId, activeStatus: "active" },

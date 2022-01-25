@@ -44,8 +44,6 @@ const cors = require('cors');
 
 db.sequelize.sync().then(() => {
     cron();
-    // checkCreditUpdates();
-    // checkRecurringPayments();
     app.listen(process.env.PORT, () => {
     console.log("running on port " + process.env.PORT);
 });

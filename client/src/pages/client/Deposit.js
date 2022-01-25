@@ -8,7 +8,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../misc/AuthContext";
 import { Card, Form, Button, Row, Col } from "react-bootstrap";
 import { reqHeader } from "../../misc/reqHeader";
-import loading from "../../resources/loading.gif";
 
 function Deposit() {
 
@@ -19,15 +18,6 @@ function Deposit() {
     height: "100px",
     "marginTop": "-50px",
   }
-  // const tempData = {
-  //   payeeAccountId: 3,
-  //   payerAccountId: 2,
-  //   value: 10,
-  //   chequeNumber: 265,
-  // };
-  // const { payeeAccountId, payerAccountId, value, chequeNumber } = tempData;
-
-  //   const [file, setFile] = useState(null);
   const [accountList, setAccountList] = useState([]);
   const [singleAccount, setSingleAccount] = useState({});
   const [alert, setAlert] = useState("");
@@ -65,21 +55,11 @@ function Deposit() {
     }
     const formData = new FormData();
     formData.append("file", submit.target.file.files[0]);
-
-    // console.log(submit.target.file.files)
-    // var form = {
-    //     payeeAccountId: submit.target.payeeAccount.value,
-    //     payerAccountId: submit.target.payerAccount.value,
-    //     value: submit.target.value.value,
-    //     chequeNumber: submit.target.chequeNumber.value,
-    //     file: submit.target.file.files[0]
-    // }
     formData.append("payeeAccountId", submit.target.payeeAccount.value);
     formData.append("payerAccountId", submit.target.payerAccount.value);
     formData.append("value", submit.target.value.value);
     formData.append("chequeNumber", submit.target.chequeNumber.value);
 
-    //   formData.append("file", file[0]);
     await axios
       .post(`/transactions/depositCheque`, formData, {
         headers: {
@@ -95,7 +75,6 @@ function Deposit() {
         setAlert(err.response.data);
         console.log(err.response.data);
       });
-    // handle success
     setLoading(false);
   };
   console.log(params.accountId);
